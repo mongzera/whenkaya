@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css"/>
+</head>
+<body>
+    <div class="container flex flex-row">
+        <div class="sidebar px-1 border-right">
+            <div class="profile flex align-center">
+                <h3>Skibidi Person</h3>
+            </div>
+            <div class="schedules">
+                <h3>Schedules</h3>
+                <hr>
+                <div class="schedule-list flex flex-col">
+                    <a href="" class="schedule-item"><h5>Personal Calendar</h5></a>
+                    <a href="" class="schedule-item schedule-item-selected"><h5>Friends Shared Calendar</h5></a>
+                    <a href="" class="schedule-item"><h5>Notre Dame Events</h5></a>
+                    <a href="" class="schedule-item"><h5>Comsci Peeps Sched</h5></a>
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="mainview flex flex-row">
+            <div class="left-section border-right">
+                <div class="calendar container-padding">
+                    <h3>Calendar</h3>
+                    <div class="calendar-view flex flex-col align-center justify-center">
+                        <span style="align-items: center; justify-content: space-between; width: 100%;" class="flex flex-row "><button class="no-decor calendar-button" onclick="prevMonth()"><</button><h3 id='monthName'></h3><button class="no-decor calendar-button"onclick="nextMonth()">></button></span>
+                    <canvas id='calendar' width="400px" height="400px"> 
+                    </div>
+                </div>
+                <div class="daily-notes-view container-padding">
+                    <h3>Daily Notes</h3>
+                </div>
+            </div>
+            <div class="daily-scheduler container-padding">
+                <h3>Day Schedule</h3>
+
+                <!-- put a <h4> here, display the targeted date, year, month, day e.g 2024 November 14-->
+            </div>
+        </div>
+    </div>
+
+    <!--Calendar implementation-->
+    <script>
+        class Calendar{
+            days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+            months = [
+                'January',
+                'Febuary',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December'
+            ];
+
+            //set the current date as the default target
+            //this is only for now...
+
+            targetDate = {
+                day : 1,
+                month : 1,
+                year : 2024
+            };
+
+            ctx = null;
+            canvas = null;
+
+            constructor(canvas){
+                this.ctx = canvas.getContext('2d');
+
+                setInterval(this.updateView, 1000 / 60);
+            }
+
+            measureText = (ctx, text) => {
+                // Measure text width
+                const width = ctx.measureText(text).width;
+
+                // Use regex to extract the font size (works even with numerical weight)
+                const fontSizeMatch = ctx.font.match(/\d+(\.\d+)?px/); // Match numbers followed by 'px'
+                const fontSize = fontSizeMatch ? parseFloat(fontSizeMatch[0]) : 16; // Default to 16 if no match is found
+
+                // The height is approximately equal to the font size
+                const height = fontSize;
+
+                return { width, height };
+            }
+
+            getDaysInMonth = (targetYear, targetMonth) => {
+               return new Date(targetYear, targetMonth+1, 0).getDate();
+            }
+
+
+            updateView(ctx){
+                ctx.clearRect(0, 0, w, h);
+
+                let targetDate = new Date(cldrObj.targetYear, cldrObj.targetMonth, 1);
+                let daysInAMonth = this.getDaysInMonth(cldrObj.targetYear, cldrObj.targetMonth);
+
+                for(let i = 0; i < days.length; i++){
+                    ctx.fillStyle="#000";
+                    if(i == 0) ctx.fillStyle = "#FF0000";
+                    ctx.fillText(days[i], i * daySpacing + daySpacing*0.5 - 8, 30);
+                }
+
+                let dayOffset = -targetDate.getDay() + 1;
+                for(let i = 0; i < 6 * 7; i++){
+                    
+                    let day = new Date(cldrObj.targetYear, cldrObj.targetMonth, dayOffset + i);
+                    let textDim = this.measureText(ctx, day.getDate());
+                    let x = i % days.length;
+                    let y = Math.floor(i/days.length);
+
+                    ctx.fillStyle = "#000";
+                    if(dayOffset + i < 1 || dayOffset + i > daysInAMonth) ctx.fillStyle = "#B8B8B8";
+
+                    ctx.fillText(day.getDate(), x * daySpacing + 40 - textDim.width, y * daySpacing + 80);
+                }
+            };
+            
+        }
+    </script>
+    <script>
+
+            let days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+            let months = [
+                'January',
+                'Febuary',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December'
+            ];
+
+        let measureText = (ctx, text) => {
+            // Measure text width
+            const width = ctx.measureText(text).width;
+
+            // Use regex to extract the font size (works even with numerical weight)
+            const fontSizeMatch = ctx.font.match(/\d+(\.\d+)?px/); // Match numbers followed by 'px'
+            const fontSize = fontSizeMatch ? parseFloat(fontSizeMatch[0]) : 16; // Default to 16 if no match is found
+
+            // The height is approximately equal to the font size
+            const height = fontSize;
+
+            return { width, height };
+        }
+
+        let getDaysInMonth = (targetYear, targetMonth) => {
+               return new Date(targetYear, targetMonth+1, 0).getDate();
+            }
+
+        let createCalendar = (cldr, cldrObj) => {
+            
+
+            let ctx = cldr.getContext('2d');
+            let w = cldr.width;
+            let h = cldr.height;
+
+            ctx.font = "400 16px Inter";
+
+            let daySpacing = w / days.length;
+
+            let offsetY = 0;
+
+            let loop = () => {
+                
+                
+            }
+
+
+
+            setInterval(loop, 1000/60);
+
+        }
+
+        let calendarObj = {
+            targetYear : 2024,
+            targetMonth : 10,
+        }
+
+        let updateDate = (year, month) => {
+            document.getElementById('monthName').innerHTML = months[month] + " " + year;
+        }
+
+        createCalendar(document.getElementById('calendar'), calendarObj);
+        updateDate(calendarObj.targetYear, calendarObj.targetMonth);
+
+        
+
+        let prevMonth = () => {
+            calendarObj.targetMonth--;
+            if(calendarObj.targetMonth < 0){
+                calendarObj.targetYear--;
+                calendarObj.targetMonth = 11;
+            } 
+
+            updateDate(calendarObj.targetYear, calendarObj.targetMonth);
+            console.log(calendarObj);     
+        }
+
+        let nextMonth = () => {
+            calendarObj.targetMonth++;
+            if(calendarObj.targetMonth > 11){
+                calendarObj.targetYear++;
+                calendarObj.targetMonth = 0;
+            } 
+            updateDate(calendarObj.targetYear, calendarObj.targetMonth);
+            console.log(calendarObj);   
+        }
+    </script>
+</body>
+</html>

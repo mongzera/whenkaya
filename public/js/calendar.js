@@ -1,0 +1,250 @@
+(() => {
+    let cldnrCtn = document.getElementById('calendar-container');
+    let canvas = document.createElement('canvas');
+    canvas.setAttribute("width", "400px");
+    canvas.setAttribute("height", "400px");
+    canvas.setAttribute("id", "calendar");
+    cldnrCtn.appendChild(canvas);
+    let ctx = canvas.getContext('2d');
+    let dt = 0;
+
+    let measureText = (ctx, text) => {
+        const width = ctx.measureText(text).width;
+        const fontSizeMatch = ctx.font.match(/\d+(\.\d+)?px/); 
+        const fontSize = fontSizeMatch ? parseFloat(fontSizeMatch[0]) : 16; 
+        const height = fontSize;
+        return { width, height };
+    }
+
+    let getDaysInMonth = (targetYear, targetMonth) => {
+       return new Date(targetYear, targetMonth+1, 0).getDate();
+    }
+
+    let mousePosition = {
+        x : 0,
+        y : 0
+    }
+
+    class CalendarState{
+        
+
+        constructor(){
+            this.monthName = document.getElementById("month_name");
+            this.nextMonthBtn = document.getElementById("next_month_btn");
+            this.prevMonthBtn = document.getElementById("prev_month_btn");
+
+            this.prevMonthBtn.onclick = () => {
+                this.prevMonth();
+            }
+
+            this.nextMonthBtn.onclick = () => {
+                this.nextMonth();
+            }
+        }
+
+        days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+        months = [
+            'January',
+            'Febuary',
+            'March',
+            'April',
+            'May',
+            'June',
+            'July',
+            'August',
+            'September',
+            'October',
+            'November',
+            'December'
+        ];
+
+        _targetDate = {
+            day : 1,
+            month : 0,
+            year : 2024,
+        };
+
+        //implement lerping for this, make it smooooth
+        _hoverData = {
+            //listenToHover : true,
+            outlinePad : 20,
+            currentX : 0,
+            currentY : 0,
+            oldX : 0,
+            oldY : 0,
+            isHoveredDayInTargetMonth : false, //if it is false, if the user clicked this day, set the target month on it.
+            dateInfo : null
+        }
+
+        setTargetDate(){
+            if(this._hoverData.dateInfo == null) return;
+
+            this._targetDate.day = this._hoverData.dateInfo.getDate();
+            this._targetDate.month = this._hoverData.dateInfo.getMonth();
+            this._targetDate.year = this._hoverData.dateInfo.getFullYear();
+
+            console.log(this._targetDate);
+
+            //this._hoverData.listenToHover = false;
+
+        }
+
+        isDayBeingHovered = (textX, textY, textWidth, textHeight, withinTargetMonth) => {
+            this._hoverData.isHoveredDayInTargetMonth = withinTargetMonth;
+            return (mousePosition.x >= textX && mousePosition.x <= textX + textWidth) && (mousePosition.y >= textY && mousePosition.y <= textY + textHeight);
+        };
+
+        prevMonth = () => {
+            this._targetDate.month--;
+            if(this._targetDate.month < 0){
+                this._targetDate.year--;
+                this._targetDate.month = 11;
+            } 
+
+            //updateDate(calendarObj.targetYear, calendarObj.targetMonth);
+        };
+
+        nextMonth = () => {
+            this._targetDate.month++;
+            if(this._targetDate.month > 11){
+                this._targetDate.year++;
+                this._targetDate.month = 0;
+            } 
+            //updateDate(calendarObj.targetYear, calendarObj.targetMonth);
+            //console.log(calendarObj);   
+        };
+
+        isTargetDate = (_targetDate, dateObj) => {
+            //console.log(_targetDate);
+            //console.log(dateObj.getFullYear());
+            return dateObj.getDate() == _targetDate.day && dateObj.getMonth() == _targetDate.month && dateObj.getFullYear() == _targetDate.year;
+        }
+
+        _lerpAnimation = (ctx) => {
+            //animate date hovering
+            let lerpFactor = 0.10;
+
+            this._hoverData.oldX += (this._hoverData.currentX - this._hoverData.oldX) * lerpFactor;
+            this._hoverData.oldY += (this._hoverData.currentY - this._hoverData.oldY) * lerpFactor;
+
+            ctx.strokeStyle = "#B8B8B8";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(this._hoverData.oldX - this._hoverData.outlinePad, this._hoverData.oldY - this._hoverData.outlinePad, 2 * this._hoverData.outlinePad, 2 * this._hoverData.outlinePad, 5);
+            ctx.stroke();
+        }
+
+        draw = () => {
+            //console.log('update');
+            
+            let selectedDate = new Date(this._targetDate.year, this._targetDate.month, 1);
+    
+            let monthDays = getDaysInMonth(this._targetDate.year, this._targetDate.month);
+            let dayOffset = -selectedDate.getDay() + 1;
+
+            let w = canvas.width;
+            let h = canvas.height;
+            let daySpacing = w / this.days.length;
+
+            //set month_name
+            this.monthName.innerHTML = this.months[selectedDate.getMonth()] + " " + this._targetDate.year;
+            
+            ctx.clearRect(0, 0, w, h);
+
+            this._lerpAnimation(ctx);
+
+            ctx.font = "700 16px Inter"; //make it thiccc
+            for(let i = 0; i < this.days.length; i++){
+                ctx.fillStyle="#000";
+                if(i == 0) ctx.fillStyle = "#FF0000";
+                ctx.fillText(this.days[i], i * daySpacing + daySpacing*0.5 - 8, 30);
+            }
+
+
+
+            ctx.font = "400 16px Inter"; //set it back to thin
+            for(let i = 0; i < 6 * 7; i++){
+                
+                let day = new Date(this._targetDate.year, this._targetDate.month, dayOffset + i);
+                let textDim = measureText(ctx, day.getDate());
+                let x = i % this.days.length;
+                let y = Math.floor(i/this.days.length);
+
+                ctx.fillStyle = "#000";
+                let isDayWitinTargetMonth = true;
+                if(dayOffset + i < 1 || dayOffset + i > monthDays) {
+                    ctx.fillStyle = "#B8B8B8";
+                    isDayWitinTargetMonth = false;
+                }
+
+                let pad = 15;
+                let textX = x * daySpacing + 40 - textDim.width;
+                let textY = y * daySpacing + 80;
+                let textW = textDim.width;
+                let textH = textDim.height;
+
+                let midX = textX + textW*0.5;
+                let midY = textY - textH*0.5;
+
+                let outlinePad = 20;
+
+                ctx.fillText(day.getDate(), textX , textY);
+
+                if( this.isDayBeingHovered(midX - outlinePad, midY - outlinePad, 2 * outlinePad, 2 * outlinePad) ){
+                    this._hoverData.currentX = midX;
+                    this._hoverData.currentY = midY;
+                    this._hoverData.isHoveredDayInTargetMonth = isDayWitinTargetMonth;
+                    this._hoverData.dateInfo = day;
+                    // ctx.fillStyle = "#0f0";
+                    // ctx.beginPath();
+                    // ctx.ellipse(midX, midY, 5, 5, 0, 0, Math.PI*2, false);
+                    // ctx.fill();
+
+                    // ctx.strokeStyle = "#B8B8B8";
+                    // ctx.lineWidth = 2;
+                    // ctx.beginPath();
+                    // ctx.roundRect(midX - outlinePad, midY - outlinePad, 2 * outlinePad, 2 * outlinePad, 5);
+                    // ctx.stroke();
+                }
+
+                //if target date, draw a red outline
+                if(this.isTargetDate(this._targetDate, day)){
+                    ctx.strokeStyle = "#FF0000";
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.roundRect(midX - outlinePad, midY - outlinePad, 2 * outlinePad, 2 * outlinePad, 5);
+                    ctx.stroke();
+                }
+            }
+            
+        }
+
+    }
+
+    window.onload = () =>{
+        let calendarState = new CalendarState();
+        
+        let sT =  Date.now();
+        setInterval(() => {
+            calendarState.draw()
+
+        }, 1000 / 144); //apparently, u have to put it in anon-function for it to be called ¯\_(ツ)_/¯
+
+        //mousemove listener
+        canvas.addEventListener("mousemove", (evt) => {
+            let canvasBoundingRect = canvas.getBoundingClientRect();
+            mousePosition.x = evt.clientX - canvasBoundingRect.left;
+            mousePosition.y = evt.clientY - canvasBoundingRect.top;
+        });
+
+        canvas.addEventListener("mousedown", (evt) => {
+            console.log("pressed");
+            calendarState.setTargetDate();
+        });
+
+        // setInterval(() => {
+        
+        //     calendarState.nextMonth();
+        // }, 1000);
+    }
+})();

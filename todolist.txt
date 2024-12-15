@@ -1,0 +1,9 @@
+TODO:: Create calendar [DONE!]
+TODO:: Create database for schedule[DONE]
+TODO:: Create authentication pages
+TODO:: Create db connection
+TODO:: Query db to create and login accounts
+TODO:: Query db to add events, reminders, and schedules
+
+TODO:: Implement CSRF Tokenization for authentication
+https://leafphp.dev/docs/security/csrf.html >> it has some CSRF implementation

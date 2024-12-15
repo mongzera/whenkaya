@@ -1,0 +1,197 @@
+*{
+    margin: 0px;
+    padding: 0px;
+    font-family: 'Inter';
+    font-weight: 600;
+}
+
+:root{
+    --hl: #B8B8B8; /* highlights */
+    --light-bg: #F5F5F5; 
+    --blue: #4F82B1;
+    --light-blue: #5b96ce;
+    --dark-blue: #426d96;
+    --white: #FFF;
+}
+
+.no-decor{
+    text-decoration: none;
+    color: #000;
+}
+
+.container{
+    margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
+    width: 1250px;
+}
+
+.border-right{
+    border-right: 1px solid var(--hl);
+}
+
+.border-left{
+    border-left: 1px solid var(--hl);
+}
+
+.px-1{
+    padding: 0px 1.5em 0px 1.5em;
+}
+
+.flex{
+    display: flex;
+}
+
+.flex-row{
+    flex-direction: row;
+}
+
+.flex-col{
+    flex-direction: column;
+}
+
+.justify-center{
+    justify-content: center;
+}
+
+.justify-around{
+    justify-content: space-around;
+}
+
+.justify-evenly{
+    justify-content: space-evenly;
+}
+
+.justify-between{
+    justify-content: space-between;
+}
+.align-center{
+    align-items: center;
+}
+
+.sidebar{
+    width: 200px;
+    height: 100vh;
+}
+
+.profile{
+    height: 100px;
+}
+
+.schedules h3{
+    margin: 15px 0px 15px 0px;
+}
+
+.schedule-list{
+    
+}
+
+.schedule-item{
+    
+    text-decoration: none;
+    color: #000;
+    padding: 10px 0px 10px 12px;
+    width: 210;
+    border-radius: 8px;
+}
+
+.new-schedule-inp{
+    width: 210;
+    border-radius: 8px;
+    padding: 8px 0px 8px 10px;
+    outline: none;
+}
+
+.container-padding{
+    padding: 40px 50px 0px 50px;
+}
+
+.schedule-item-selected{
+    background-color: var(--light-bg);
+}
+
+.calendar{
+    
+}
+
+.calendar-view{
+    padding: 20px 0px 0px 0px;
+}
+
+.calendar-button{
+    font-size: 1.5em;
+    font-weight: 300;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    width: 35px;
+
+}
+
+.calendar-button:hover{
+    border: 1px solid var(--hl);
+}
+
+.calendar-button:active{
+    background-color: var(--hl);
+}
+
+.auth-container{
+    width: 350px;
+    height: 375px;
+    background-color: var( --white);
+    border-radius: 25px;
+    border: 1px solid var(--hl);
+    box-shadow: 0px 5px 15px 10px rgba(0, 0, 0, 0.03);
+    margin: 0 auto;
+    margin-top: 50px;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-input-fields{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 25px;
+}
+
+.auth-input-field{
+    width: 250px;
+    height: 35px;
+    border-radius: 10px;
+    outline: none;
+    border: 1px solid var(--hl);
+    padding: 0px 0px 0px 25px;
+    margin: 5px 0px 5px 0px;
+}
+
+.auth-input-field::placeholder{
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--hl);
+}
+
+.auth-submit{
+    min-width: 200px  !important;
+    max-width: 200px  !important;
+    background-color: var(--blue)  !important;
+    color: var(--white)  !important;
+    font-size: 10px !important;
+    border: 0px !important;
+    padding: 0px !important;
+}
+
+
+.auth-submit:hover{
+    background-color: var(--light-blue) !important;
+}
+
+.auth-submit:active{
+    background-color: var(--dark-blue)  !important;
+}
+
