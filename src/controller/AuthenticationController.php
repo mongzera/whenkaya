@@ -2,7 +2,9 @@
 
 namespace Src\Controller;
 
+use Src\Db\Database;
 use Src\Middleware\Auth;
+use Src\Model\UserModel;
 
 class AuthenticationController extends BaseController{
     public function login(){
@@ -21,6 +23,11 @@ class AuthenticationController extends BaseController{
             "css" => ['css/global.css', 'css/theme.css', 'css/auth/auth.css'],
             "js"  => []
         ];
+
+        $db = new Database();
+        $db->createDatabase("test_orm");
+        $db->setDatabase("test_orm");
+        $db->createTable(new UserModel("user", 'user_id'));
 
         render_page($content, $static);
     }
