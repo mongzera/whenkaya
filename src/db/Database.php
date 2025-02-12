@@ -7,20 +7,20 @@ use Src\Model\BaseModel;
 use PDO, PDOException;
 
 class Database{
-    protected $url = "localhost";
-    protected $username = "root";
-    protected $password = "";
-    protected $database = "";
+    public static $url = "localhost";
+    public static $username = "root";
+    public static $password = "";
+    public static $database = "";
 
     public function connect(){
         try{
-            $_conn = new PDO("mysql:host=$this->url;", $this->username, $this->password);
+            $_conn = new PDO("mysql:host=" . Database::$url . ";", Database::$username, Database::$password);
             
             // set the PDO error mode to exception
             $_conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             //use database
-            if($this->database != "") $_conn->exec("USE $this->database");
+            if(Database::$database != "") $_conn->exec("USE " . Database::$database);
 
             return $_conn;
         }catch(PDOException $e) {
@@ -40,7 +40,7 @@ class Database{
     }
 
     public function setDatabase($db_name){
-        $this->database = $db_name;
+        Database::$database = $db_name;
     }
 
 
@@ -50,7 +50,7 @@ class Database{
         $pk = $model->getPrimaryKey();
 
         $sql = "CREATE TABLE IF NOT EXISTS $model_name (";
-        $sql = $sql . $pk->asSQL() . ", ";
+        $sql = $sql . $pk->asSQL() . " AUTO_INCREMENT, ";
 
         foreach($model->getNonKeyFields() as $fields){
             $sql = $sql . $fields->asSQL() . ", ";
@@ -59,7 +59,7 @@ class Database{
         //set pk, fk, otherss...
         $sql = $sql . " PRIMARY KEY ($pk->fieldName));";
 
-        echo $sql . '<br><br>';
+        //echo $sql . '<br><br>';
 
         $conn = $this->connect();
         try{

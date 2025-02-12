@@ -1,12 +1,13 @@
 (() => {
     let updateScheduleList = () => {
         let schedList = document.getElementById('schedule-list');
-        schedList.innerHTML = ''; //remove all childrens
+        
         $.post("/fetchuserschedule", null, (response, status) => {
             if(response.status === 'success'){
+                schedList.innerHTML = "";
                 response.data.forEach(e => {
                     let schedItem = document.createElement('a');
-                    schedItem.setAttribute("href", e[1]);
+                    schedItem.setAttribute("href", "#");
                     schedItem.setAttribute("class", "schedule-item");
 
                     let text = document.createElement('h5');
@@ -28,21 +29,26 @@
 
         let schedNameInp = document.createElement('input'); //schedule name input
         schedNameInp.setAttribute("class", "new-schedule-inp");
+        schedNameInp.setAttribute("type", "text");
         schedList.appendChild(schedNameInp);
+        schedNameInp.focus();
 
         schedList.addEventListener("keypress", (evt) => {
             if(evt.key !== 'Enter') return;
             //xmlhttprequest
             let schedTitle = schedNameInp.value;
+            newScheduleBtn.removeAttribute('creating');
+            schedList.removeChild(schedNameInp);
             //console.log(schedTitle);
             $.post("/addschedule", {
                 'schedule_title' : schedTitle
             }, (data, status) => {
-                alert("Data: " + data + "\nStatus: " + status);
-                schedList.removeChild(schedNameInp);
-                newScheduleBtn.removeAttribute('creating');
+                //alert("Data: " + data + "\nStatus: " + status);
+                
                 updateScheduleList();
             });
+
+
         });
     }
 

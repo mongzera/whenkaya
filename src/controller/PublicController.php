@@ -1,6 +1,7 @@
 <?php
 namespace Src\Controller;
 
+use Src\Middleware\Auth;
 
 class PublicController extends BaseController{
 

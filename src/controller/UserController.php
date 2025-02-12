@@ -25,6 +25,12 @@ class UserController extends BaseController{
         //     exit();
         // }
         echo 'success';
+        
+        $schedTitle = cleanRequest($_POST['schedule_title']);
+        if(!$schedTitle) echo 'failed';
+        
+        addCalendar($schedTitle);
+
         //array_push(PublicController::$data, [$_POST['schedule_title'], '/uuid124123d12']);
     }
 
@@ -33,10 +39,11 @@ class UserController extends BaseController{
         $response = array(
             'status' => 'success',
             'message' => 'Data fetched successfully',
-            'data' => ''
+            'data' => getAllCalendar(1)
         );
 
         echo json_encode($response);
         exit();
     }
 }
+?>

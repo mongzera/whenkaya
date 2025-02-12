@@ -2,6 +2,10 @@
 
 namespace Src\Model;
 
+use Src\Db\Database;
+use PDO;
+use PDOException;
+
 enum DataType{
     case VARCHAR;
     case INT;
@@ -85,7 +89,7 @@ abstract class BaseModel{
     protected string $created_at = "date_created";
     protected string $updated_at = "date_updated";
 
-    public function __construct($model_name, $pk) {
+    public function init($model_name, $pk) {
         $this->model_name = $model_name;
         $this->primaryKey = new ModelColumnAttrib($pk, DataType::INT, 0, true, false, '', false);
     }
@@ -112,5 +116,40 @@ abstract class BaseModel{
     public function getNonKeyFields(){
         return $this->nonkey_fields;
     }
+
+    public function getAll(){
+        $db = new Database();
+        $conn = $db->connect();
+        $sql = "SELECT * FROM $this->model_name;";
+        $stmt = $conn->query($sql);
+        $resultset = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $resultset;
+    }
+
+    //insert values to non-key-fields except for date_created and date_updated
+    public function insertRow($ordered_values){
+        $field_names = "";
+        $values = "";
+        for($i = 0; $i < sizeof($this->nonkey_fields); $i++){
+            
+            if($this->nonkey_fields[$i]->fieldName == "date_created") break;
+
+            $field_names = $field_names . ($i > 0 ? ", " : "") . $this->nonkey_fields[$i]->fieldName;
+            $values = $values . ($i > 0 ? ", " : "") . "'" . $ordered_values[$i] . "'";
+        }
+
+        $db = new Database();
+        $conn = $db->connect();
+        $sql = "INSERT INTO $this->model_name ($field_names) VALUES ($values);";
+
+        echo $sql;
+        try{
+            $conn->exec($sql);
+        }catch(PDOException $e){
+            echo $e->getMessage();
+        }
+
+    } 
 }
 

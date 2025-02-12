@@ -1,0 +1,1 @@
+{"version":1,"defects":{"Tests\\QueryBuilderTest::testSqlString":8,"QueryBuilderTest::testSqlString":7,"QueryBuilderTest::testSelect":7,"QueryBuilderTest::testCreateTable":7},"times":{"Tests\\QueryBuilderTest::testSqlString":0.014,"QueryBuilderTest::testSqlString":0.015,"QueryBuilderTest::testSelect":0.02,"QueryBuilderTest::testCreateTable":0.017}}
