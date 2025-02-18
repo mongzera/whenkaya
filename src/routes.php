@@ -12,8 +12,7 @@ function create_get_routes($router){
      $router->map("GET", "/login", "AuthenticationController::login_account", 'login_account_get');
      $router->map("GET", "/dashboard", "UserController::dashboard", "dashboard");
     // $router->map("GET", "/create-account", 'AuthController::create_account', 'create_account');
-    // $router->map("GET", "/login", "AuthController::login", "login");
-    // $router->map("GET", "/logout", "AuthController::logout", "logout");
+     $router->map("GET", "/logout", "AuthenticationController::logout", "logout");
 }
 
 function create_post_routes($router){

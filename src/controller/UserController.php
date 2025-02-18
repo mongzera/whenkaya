@@ -2,9 +2,14 @@
 
 namespace Src\Controller;
 
+use Src\Middleware\Auth;
+
 class UserController extends BaseController{
+    
     public function dashboard(){
         
+        Auth::redirectIfNotLoggedIn();
+
         $content = [
             "title" => "hello",
             "head" => "../src/views/default_head.php",
@@ -24,12 +29,14 @@ class UserController extends BaseController{
         //     echo 'failed';
         //     exit();
         // }
+        
+        if(!isPost()) return;
         echo 'success';
         
         $schedTitle = cleanRequest($_POST['schedule_title']);
         if(!$schedTitle) echo 'failed';
-        
-        addCalendar($schedTitle);
+        echo Auth::getUserId();
+        addCalendar($schedTitle, Auth::getUserId(), 0);
 
         //array_push(PublicController::$data, [$_POST['schedule_title'], '/uuid124123d12']);
     }
@@ -39,7 +46,7 @@ class UserController extends BaseController{
         $response = array(
             'status' => 'success',
             'message' => 'Data fetched successfully',
-            'data' => getAllCalendar(1)
+            'data' => getAllCalendar(Auth::getUserId())
         );
 
         echo json_encode($response);

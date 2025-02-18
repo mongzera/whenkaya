@@ -7,12 +7,27 @@ use Src\Middleware\Auth;
 use Src\Model\UserModel;
 
 class AuthenticationController extends BaseController{
-    public function login(){
-
-    }
 
     public function create_account(){
-        if(Auth::user()) redirect("home");
+        if(Auth::user()) redirect("dashboard");
+
+        //create new user logic
+        if(isPost()){
+            $username = cleanRequest($_POST['username']);
+            $password = cleanRequest($_POST['password']);
+            $retype_password = cleanRequest($_POST['retype-password']);
+
+            $hashed = password_hash($password, PASSWORD_DEFAULT);
+
+            if(!($password === $retype_password)) echo "Password mismatch! $password != $retype_password";
+            
+            if(db_create_user($username, $hashed)){
+                Auth::authenticate_user($username, $password);
+                redirect("dashboard");
+            
+            }
+        }
+
         $content = [
             "title" => "Create Account",
             "head" => "../src/views/default_head.php",
@@ -24,24 +39,35 @@ class AuthenticationController extends BaseController{
             "js"  => []
         ];
 
-        $db = new Database();
-        $db->createDatabase("test_orm_db");
-        $db->setDatabase("test_orm_db");
+        // $db = new Database();
+        // $db->createDatabase("test_orm_db");
+        // $db->setDatabase("test_orm_db");
         
-        $userModel = new UserModel();
-        $db->createTable($userModel);
+        // $userModel = new UserModel();
+        // $db->createTable($userModel);
 
-        $userModel->insertRow(["ethan", "gamat"]);
-        $userModel->insertRow(["ethan2", "gamat2"]);
-        $userModel->insertRow(["ethan3", "gamat3"]);
-        $userModel->insertRow(["ethan4", "gamat4"]);
-        $userModel->insertRow(["ethan5", "gamat5"]);
+        // $userModel->insertRow(["ethan", "gamat"]);
+        // $userModel->insertRow(["ethan2", "gamat2"]);
+        // $userModel->insertRow(["ethan3", "gamat3"]);
+        // $userModel->insertRow(["ethan4", "gamat4"]);
+        // $userModel->insertRow(["ethan5", "gamat5"]);
 
         render_page($content, $static);
     }
 
     public function login_account(){
-        if(Auth::user()) redirect("home");
+        if(Auth::user()) redirect("dashboard");
+
+        //login user logic
+        if(isPost()){
+            $username = cleanRequest($_POST['username']);
+            $password = cleanRequest($_POST['password']);
+
+            if(Auth::authenticate_user($username, $password)){
+                redirect("dashboard");
+            }
+        }
+
         $content = [
             "title" => "Login Account",
             "head" => "../src/views/default_head.php",
@@ -54,5 +80,9 @@ class AuthenticationController extends BaseController{
         ];
 
         render_page($content, $static);
+    }
+
+    public function logout(){
+        Auth::logout();
     }
 }

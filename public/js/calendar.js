@@ -22,7 +22,8 @@
 
     let mousePosition = {
         x : 0,
-        y : 0
+        y : 0,
+        wasInsideCalendar : false
     }
 
     class CalendarState{
@@ -40,6 +41,10 @@
             this.nextMonthBtn.onclick = () => {
                 this.nextMonth();
             }
+
+            this.setTargetDate(new Date());
+
+            this.shouldAnimateHoverBorder = false;
         }
 
         days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
@@ -61,7 +66,7 @@
         _targetDate = {
             day : 1,
             month : 0,
-            year : 2024,
+            year : 1975,
         };
 
         //implement lerping for this, make it smooooth
@@ -76,12 +81,12 @@
             dateInfo : null
         }
 
-        setTargetDate(){
-            if(this._hoverData.dateInfo == null) return;
+        setTargetDate(dateObject){
+            if(dateObject == null) return;
 
-            this._targetDate.day = this._hoverData.dateInfo.getDate();
-            this._targetDate.month = this._hoverData.dateInfo.getMonth();
-            this._targetDate.year = this._hoverData.dateInfo.getFullYear();
+            this._targetDate.day = dateObject.getDate();
+            this._targetDate.month = dateObject.getMonth();
+            this._targetDate.year = dateObject.getFullYear();
 
             console.log(this._targetDate);
 
@@ -121,6 +126,8 @@
         }
 
         _lerpAnimation = (ctx) => {
+            if(!this.shouldAnimateHoverBorder) return;
+
             //animate date hovering
             let lerpFactor = 0.10;
 
@@ -136,6 +143,8 @@
 
         draw = () => {
             //console.log('update');
+
+            this.shouldAnimateHoverBorder = mousePosition.wasInsideCalendar;
             
             let selectedDate = new Date(this._targetDate.year, this._targetDate.month, 1);
     
@@ -195,6 +204,7 @@
                     this._hoverData.currentY = midY;
                     this._hoverData.isHoveredDayInTargetMonth = isDayWitinTargetMonth;
                     this._hoverData.dateInfo = day;
+                    console.log("DAY IS HOVERED!");
                     // ctx.fillStyle = "#0f0";
                     // ctx.beginPath();
                     // ctx.ellipse(midX, midY, 5, 5, 0, 0, Math.PI*2, false);
@@ -209,6 +219,14 @@
 
                 //if target date, draw a red outline
                 if(this.isTargetDate(this._targetDate, day)){
+                    if(!this.shouldAnimateHoverBorder){
+                        this._hoverData.newX = midX;
+                        this._hoverData.newY = midY;
+                        this._hoverData.oldX = midX;
+                        this._hoverData.oldY = midY;
+                        
+                    }
+
                     ctx.strokeStyle = "#FF0000";
                     ctx.lineWidth = 2;
                     ctx.beginPath();
@@ -235,16 +253,19 @@
             let canvasBoundingRect = canvas.getBoundingClientRect();
             mousePosition.x = evt.clientX - canvasBoundingRect.left;
             mousePosition.y = evt.clientY - canvasBoundingRect.top;
+
+            let xInside = (mousePosition.x >= canvasBoundingRect.x && mousePosition.x <= canvasBoundingRect.x + canvasBoundingRect.width);
+            let yInside = (mousePosition.y >= canvasBoundingRect.y && mousePosition.y <= canvasBoundingRect.y + canvasBoundingRect.height);
+
+            if(xInside && yInside) mousePosition.wasInsideCalendar = true;
+            
         });
 
         canvas.addEventListener("mousedown", (evt) => {
             console.log("pressed");
-            calendarState.setTargetDate();
+            calendarState.setTargetDate(calendarState._hoverData.dateInfo);
         });
 
-        // setInterval(() => {
-        
-        //     calendarState.nextMonth();
-        // }, 1000);
+        //set calendarState.setTargetDate
     }
 })();

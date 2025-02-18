@@ -1,7 +1,13 @@
+<?php
+
+use Src\Middleware\Auth;
+
+?>
+
 <div class="container flex flex-row">
         <div class="sidebar px-1 border-right">
             <div class="profile flex align-center">
-                <h3>Skibidi Person</h3>
+                <h3><?php echo Auth::getUserName() ?></h3>
             </div>
             <div class="schedules">
             <span class="flex flex-row justify-between align-center"><h3>Schedules</h3><button class='calendar-button' id='add-schedule-btn'>+</button></span>

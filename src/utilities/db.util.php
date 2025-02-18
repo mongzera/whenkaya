@@ -2,13 +2,36 @@
 
 use Src\Db\Database;
 
+define("DUPLICATE_ENTRY", 23000);
+
 function connect_db(){
     $dbInstance = new Database();
     $dbInstance->setDatabase("whenkaya_db");
     return $dbInstance->connect();
 }
 
-function addCalendar($name){
+//@returns boolean
+function db_create_user($username, $password){
+    $conn = connect_db();
+    $query = "INSERT INTO tb_basic_user_info (`first_name`, `last_name`, `password`, `date_created`, `date_modified`) VALUES ('$username', '', '$password', NOW(), NOW());";
+    $stmt = $conn->prepare($query);
+    
+
+    try{
+        $stmt->execute();
+        return true;
+
+    }catch(PDOException $e){
+        $errCode = $e->getCode();
+        //duplicate entry
+        if($errCode == DUPLICATE_ENTRY){
+            echo "User already exists!";
+            return false;
+        }
+    }
+}
+
+function addCalendar($name, $userId, $role){
     $conn = connect_db();
 
     $create_new_calendar = "INSERT INTO tb_calendar (`calendar_name`, `date_created`, `date_modified`) VALUES ('$name', NOW(), NOW())";
@@ -16,10 +39,15 @@ function addCalendar($name){
     if($stmt->execute() == true){
         $retrieve_recent_calendar_id = $conn->lastInsertId();
 
-        $new_user_calendar_assoc = "INSERT INTO tb_user_calendar_assoc (`user_id`, `calendar_id`, `user_role`, `date_created`, `date_modified`) VALUES (2, $retrieve_recent_calendar_id, 0, NOW(), NOW());";
+        $new_user_calendar_assoc = "INSERT INTO tb_user_calendar_assoc (`user_id`, `calendar_id`, `user_role`, `date_created`, `date_modified`) VALUES ($userId, $retrieve_recent_calendar_id, $role, NOW(), NOW());";
         $stmt = $conn->prepare($new_user_calendar_assoc);
 
-        $stmt->execute();
+        try{
+            $stmt->execute();
+        }
+        catch(PDOException $e){
+            echo $e->getMessage();
+        }
         
     }
     else var_dump("FAILED TO ADD");
