@@ -17,7 +17,7 @@ class UserController extends BaseController{
         ];
 
         $static = [
-            "css" => ['css/global.css', 'css/theme.css'],
+            "css" => ['css/global.css', 'css/theme.css', 'css/renzo.css'],
             "js"  => ['js/calendar.js', 'js/app.js']
         ];
 

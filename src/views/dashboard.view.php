@@ -32,7 +32,14 @@ use Src\Middleware\Auth;
             </div>
             <div class="daily-scheduler container-padding">
                 <h3>Day Schedule</h3>
-
+                <div class="card-container">
+                    <div class="card">
+                        <h1>date start: </h1>
+                        <h1>date end:</h1>
+                        <h2>title</h2>
+                        <h2>description</h2>
+                    </div>
+                </div>
                 <!-- put a <h4> here, display the targeted date, year, month, day e.g 2024 November 14-->
             </div>
         </div>

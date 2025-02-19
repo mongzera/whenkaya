@@ -84,5 +84,6 @@ class AuthenticationController extends BaseController{
 
     public function logout(){
         Auth::logout();
+        redirect("login_account_get");
     }
 }
