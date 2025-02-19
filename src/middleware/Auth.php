@@ -25,8 +25,10 @@ class Auth{
         $stmt->execute();
 
         //what if first_name specified doesnt exist?
+        $rows = $stmt->fetchAll();
+        $columns = $rows[0];
+        if($columns == null) return false;
 
-        $columns = $stmt->fetchAll()[0];
         $real_user_password = $columns['password']; //bcrypt encrypted
 
         if(password_verify($password, $real_user_password)){
