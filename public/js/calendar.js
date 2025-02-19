@@ -139,6 +139,7 @@
             ctx.beginPath();
             ctx.roundRect(this._hoverData.oldX - this._hoverData.outlinePad, this._hoverData.oldY - this._hoverData.outlinePad, 2 * this._hoverData.outlinePad, 2 * this._hoverData.outlinePad, 5);
             ctx.stroke();
+        
         }
 
         draw = () => {
