@@ -12,7 +12,7 @@ use Src\Middleware\Auth;
             <div class="schedules">
             <span class="flex flex-row justify-between align-center"><h3>Schedules</h3><button class='calendar-button' id='add-schedule-btn'>+</button></span>
                 <hr>
-                <div class="schedule-list flex flex-col" id='schedule-list'>
+                <div class="schecalendar-buttondule-list flex flex-col" id='schedule-list'>
                 </div>
             </div>
         </div>
@@ -29,17 +29,27 @@ use Src\Middleware\Auth;
                 <div class="daily-notes-view container-padding">
                     <h3>Daily Notes</h3>
                 </div>
+
+            <div style="text-align: center; margin-top: 4px;">
+                <button class="calendar-button">+</button>
+            </div>
+
             </div>
             <div class="daily-scheduler container-padding">
                 <h3>Day Schedule</h3>
                 <div class="card-container">
                     <div class="card">
-                        <h1>date start: </h1>
-                        <h1>date end:</h1>
-                        <h2>title</h2>
-                        <h2>description</h2>
+                        <p>Title Description </p>
+                        <p>Date Start</p>
+                        <p>Day End</p>
+                        <p>Reminder</p>
                     </div>
                 </div>
+                  
+            <div style="text-align: center; margin-top: 4px;">
+                <button class="calendar-button" >+</button>
+            </div>
+                
                 <!-- put a <h4> here, display the targeted date, year, month, day e.g 2024 November 14-->
             </div>
         </div>
