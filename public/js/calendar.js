@@ -27,8 +27,7 @@
     }
 
     class CalendarState{
-        
-
+    
         constructor(){
             this.monthName = document.getElementById("month_name");
             this.nextMonthBtn = document.getElementById("next_month_btn");
@@ -205,7 +204,7 @@
                     this._hoverData.currentY = midY;
                     this._hoverData.isHoveredDayInTargetMonth = isDayWitinTargetMonth;
                     this._hoverData.dateInfo = day;
-                    console.log("DAY IS HOVERED!");
+                    //console.log("DAY IS HOVERED!");
                     // ctx.fillStyle = "#0f0";
                     // ctx.beginPath();
                     // ctx.ellipse(midX, midY, 5, 5, 0, 0, Math.PI*2, false);

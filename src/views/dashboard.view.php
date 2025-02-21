@@ -5,14 +5,26 @@ use Src\Middleware\Auth;
 ?>
 
 <div class="container flex flex-row">
-        <div class="sidebar px-1 border-right">
-            <div class="profile flex align-center">
-                <h3><?php echo Auth::getUserName() ?></h3>
+
+        <div class="sidebar px-1 border-right flex flex-col">
+            <div class="profile-container">
+                <div class="profile flex align-center">
+                    <h3><?php echo Auth::getUserName() ?></h3>
+                </div>
             </div>
-            <div class="schedules">
-            <span class="flex flex-row justify-between align-center"><h3>Schedules</h3><button class='calendar-button' id='add-schedule-btn'>+</button></span>
-                <hr>
-                <div class="schedule-list flex flex-col" id='schedule-list'>
+            <div class="navigations-container flex flex-row">
+                <div id='sidebar-menu-container' class="sidebar-menu-container flex flex-col justify-content">
+                    <a id='sidebar-calendar' href="#" class='sidebar-button sidebar-calendar no-decor flex align-center' selected='true'>Calendar</a>
+                    <a id='sidebar-planning' href="#" class='sidebar-button sidebar-calendar  no-decor flex align-center'>Planning</a>
+                    <a id='sidebar-tasks' href="#" class='sidebar-button sidebar-calendar  no-decor flex align-center'>Tasks</a>
+                    <a id='sidebar-collection' href="#" class='sidebar-button sidebar-calendar  no-decor flex align-center'>Collection</a>
+                </div>
+                
+                <div class="schedules">
+                <span class="flex flex-row justify-between align-center"><h3>Schedules</h3><button class='calendar-button' id='add-schedule-btn'>+</button></span>
+                    <hr>
+                    <div class="schedule-list flex flex-col" id='schedule-list'>
+                    </div>
                 </div>
             </div>
         </div>
