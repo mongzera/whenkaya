@@ -39,6 +39,19 @@ class AuthenticationController extends BaseController{
             "js"  => []
         ];
 
+        // $db = new Database();
+        // $db->createDatabase("test_orm_db");
+        // $db->setDatabase("test_orm_db");
+        
+        // $userModel = new UserModel();
+        // $db->createTable($userModel);
+
+        // $userModel->insertRow(["ethan", "gamat"]);
+        // $userModel->insertRow(["ethan2", "gamat2"]);
+        // $userModel->insertRow(["ethan3", "gamat3"]);
+        // $userModel->insertRow(["ethan4", "gamat4"]);
+        // $userModel->insertRow(["ethan5", "gamat5"]);
+
         render_page($content, $static);
     }
 
