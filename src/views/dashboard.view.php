@@ -11,9 +11,6 @@ use Src\Middleware\Auth;
             </div>
             <div class="schedules">
             <span class="flex flex-row justify-between align-center"><h3>Schedules</h3><button class='calendar-button' id='add-schedule-btn'>+</button></span>
-                <hr>
-                <div class="schecalendar-buttondule-list flex flex-col" id='schedule-list'>
-                </div>
             </div>
         </div>
 
@@ -31,7 +28,7 @@ use Src\Middleware\Auth;
                 </div>
 
             <div style="text-align: center; margin-top: 4px;">
-                <button class="calendar-button">+</button>
+                <button class="dailynotes-button">+</button>
             </div>
 
             </div>
