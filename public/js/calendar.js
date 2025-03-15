@@ -1,4 +1,34 @@
 (() => {
+
+    let cardFactory = (timeStart, timeEnd, title, desc) => {
+        let cardHTML = 
+        `
+                    <div class="card flex flex-row align-center">
+                        <div class="time flex flex-col">
+                            <div class="start-time flex justify-center">
+                                ${timeStart}
+                            </div>
+                           
+                            <div class="end-time  flex justify-center">
+                                ${timeEnd}
+                            </div>
+                        </div>
+
+                        <div class="info flex flex-col">
+                            <div class="title">
+                                ${title}
+                            </div>
+
+                            <div class="desc">
+                                ${desc}
+                            </div>
+                        </div>
+                    </div>
+        `;
+
+        return cardHTML;
+    }
+
     let cldnrCtn = document.getElementById('calendar-container');
     let canvas = document.createElement('canvas');
     canvas.setAttribute("width", "400px");
@@ -30,6 +60,22 @@
         
 
         constructor(){
+            this.days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+            this.months = [
+                'January',
+                'Febuary',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December'
+            ];
+
             this.monthName = document.getElementById("month_name");
             this.nextMonthBtn = document.getElementById("next_month_btn");
             this.prevMonthBtn = document.getElementById("prev_month_btn");
@@ -47,26 +93,13 @@
             this.shouldAnimateHoverBorder = false;
         }
 
-        days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-        months = [
-            'January',
-            'Febuary',
-            'March',
-            'April',
-            'May',
-            'June',
-            'July',
-            'August',
-            'September',
-            'October',
-            'November',
-            'December'
-        ];
+        
 
         _targetDate = {
             day : 1,
             month : 0,
             year : 1975,
+            dateObject : null
         };
 
         //implement lerping for this, make it smooooth
@@ -87,6 +120,7 @@
             this._targetDate.day = dateObject.getDate();
             this._targetDate.month = dateObject.getMonth();
             this._targetDate.year = dateObject.getFullYear();
+            this._targetDate.dateObject = dateObject;
 
             console.log(this._targetDate);
 
@@ -240,14 +274,51 @@
 
     }
 
+    let updateCurrentDateCards = (currentDate) => {
+
+        $.post("/requestusercards", {
+            'date' : {'day': currentDate.day, 'month': currentDate.month, 'year': currentDate.year}
+        }, (data, status) => {
+            //alert("Data: " + data + "\nStatus: " + status);
+            
+            //updateCalendarList();
+        });
+
+        let cardsContainer = document.getElementById('cards_container');
+
+        //clear
+        cardsContainer.innerHTML = "";
+
+        for(let i = 0; i < 5; i++){
+            cardsContainer.innerHTML += cardFactory("4:10 AM", "11:00 PM", "TEST TITLE", "TEST DESCRIPTION");
+        }
+    }
+
+    let updateDisplayDate = (calendarState) => {
+        let dashboard_date_display = document.getElementById('current_date');
+        let current_date = calendarState._targetDate;
+        dashboard_date_display.innerHTML = calendarState.months[current_date.month] + " " + current_date.day + ", " + current_date.year;
+
+        updateCurrentDateCards(calendarState._targetDate);
+    }
+
+    let showAll = () => {
+        let container = document.getElementById("container");
+
+        container.style.display = "flex";
+    }
+
+
     window.onload = () =>{
         let calendarState = new CalendarState();
         
-        let sT =  Date.now();
         setInterval(() => {
             calendarState.draw()
 
         }, 1000 / 144); //apparently, u have to put it in anon-function for it to be called ¯\_(ツ)_/¯
+
+        updateDisplayDate(calendarState);
+        showAll();
 
         //mousemove listener
         canvas.addEventListener("mousemove", (evt) => {
@@ -265,6 +336,8 @@
         canvas.addEventListener("mousedown", (evt) => {
             console.log("pressed");
             calendarState.setTargetDate(calendarState._hoverData.dateInfo);
+
+            updateDisplayDate(calendarState);
         });
 
         //set calendarState.setTargetDate

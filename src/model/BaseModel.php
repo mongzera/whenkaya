@@ -2,154 +2,96 @@
 
 namespace Src\Model;
 
-use Src\Db\Database;
 use PDO;
-use PDOException;
+use RuntimeException;
 
-enum DataType{
-    case VARCHAR;
-    case INT;
-    case TINY_INT;
-    case SMALL_INT;
-    case BIG_INT;
-    case TIMESTAMP;
-}
+require_once "../src/utilities/db.util.php";
+require_once "../src/utilities/orm.util.php";
 
-class ModelColumnAttrib{
-    public $fieldName;
-    public $datatype;
-    public $length;
-    public $unsigned;
-    public $nullable;
-    public $defaultValue;
-    public $isUnique;
-
-    public function __construct($fieldName, $datatype, $length, $unsigned = false, $nullable = true, $defaultValue = '', $isUnique = false)
-    {
-        $this->fieldName = $fieldName;
-        $this->datatype = $datatype;
-        $this->length = $length;
-        $this->unsigned = $unsigned;
-        $this->nullable = $nullable;
-        $this->defaultValue = $defaultValue;
-        $this->isUnique = $isUnique;
-    }
-
-    protected function fieldConstraints(){
-        $constraints = "";
-
-        //data type
-        $constraints = $constraints . match($this->datatype){
-            DataType::VARCHAR => "VARCHAR($this->length) ",
-            DataType::INT => "INT ",
-            DataType::TINY_INT => "TINYINT ",
-            DataType::SMALL_INT => "SMALLINT ",
-            DataType::BIG_INT => "BIGINT ",
-            DataType::TIMESTAMP => "TIMESTAMP "
-        };
-
-        //unsigned constraints
-        $constraints = $constraints . ($this->unsigned ? "UNSIGNED " : "");
-
-        //not null / null
-        $constraints = $constraints . (!$this->nullable ? "NOT NULL " : "");
-
-        //default
-        $constraints = $constraints . ($this->defaultValue !== '' ? "DEFAULT " . $this->defaultValue : "");
-
-        //auto-increment [only if integer]
-        //implement!
-        $constraints = $constraints . "";
-
-        
-
-        //zero fill [only for integers]
-        $constraints = $constraints . "";
-
-        //unique
-        $constraints = $constraints . ($this->isUnique ? "UNIQUE " : " ");
-
-        return $constraints;
-    }
-
-    public function asSQL(){
-        $sql = "";
-
-        $sql = $sql . $this->fieldName . " ";
-        $sql = $sql . $this->fieldConstraints();
-
-        return $sql;
-    }
-}
 
 abstract class BaseModel{
-    protected string $model_name;
-    protected ModelColumnAttrib $primaryKey;
-    protected $nonkey_fields = [];
-    protected string $created_at = "date_created";
-    protected string $updated_at = "date_updated";
 
-    public function init($model_name, $pk) {
-        $this->model_name = $model_name;
-        $this->primaryKey = new ModelColumnAttrib($pk, DataType::INT, 0, true, false, '', false);
+    protected string $table_name;
+    protected array $fields;
+    private $constraints;
+    private $constraintCount = 0;
+    private $row;
+
+    public function getId(int $id) : array{
+        return $this->getColumn('id', $id);
     }
 
-    public abstract function createModel();
-    protected function addNonKeyField($fieldName, $datatype, $length, $unsigned = false, $nullable = true, $defaultValue = '', $isUnique = false){
-        $modelField = new ModelColumnAttrib($fieldName, $datatype, $length, $unsigned, $nullable, $defaultValue, $isUnique);
-        array_push($this->nonkey_fields, $modelField);
+    public function getColumn($columnname, $value){
+        $conn = connect_db();
+
+        $query = "SELECT * FROM {$this->table_name} WHERE `{$columnname}` = '{$value}' LIMIT 1";
+
+        $stmt = $conn->prepare($query);
+        $stmt->execute();
+
+        $this->row = $stmt->fetchAll()[0];
+
+        return $this->row;
     }
 
-    public function datestamp(){
-        $this->addNonKeyField($this->created_at, DataType::TIMESTAMP, 0, false, false, $defaultValue = "CURRENT_TIMESTAMP()");
-        $this->addNonKeyField($this->updated_at, DataType::TIMESTAMP, 0, false, false, $defaultValue = "CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()");
-    }
-    
-    public function getModelName(){
-        return $this->model_name;
-    }
+    public function getAllFromRelatedModel($model_name, $foreign_key, $target_column, $target_value, $select = "*"){
+        $conn = connect_db();
 
-    public function getPrimaryKey() : ModelColumnAttrib{
-        return $this->primaryKey;
+        $query = "SELECT {$select} FROM `{$model_name}`, `{$this->table_name}` WHERE {$this->table_name}.{$foreign_key} = {$model_name}.id AND {$this->table_name}.{$target_column} = {$target_value};";
+        $stmt = $conn->prepare($query);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getNonKeyFields(){
-        return $this->nonkey_fields;
+
+    public function insert($data){
+        $conn = connect_db();
+
+        $data = array_intersect_key($data, $this->fields);
+
+        $keys = delimiter(array_keys($data), ",", $wrap="`?`");
+        $values = delimiter(array_values($data), ",", $wrap="'?'");
+
+        $query = "INSERT INTO `{$this->table_name}` ({$keys}) VALUES ($values);";
+
+        $stmt = $conn->prepare($query);
+
+        $status = $stmt->execute();
+
+        $this->getId($conn->lastInsertId());
+
+        return $status;
     }
 
-    public function getAll(){
-        $db = new Database();
-        $conn = $db->connect();
-        $sql = "SELECT * FROM $this->model_name;";
-        $stmt = $conn->query($sql);
-        $resultset = $stmt->fetch(PDO::FETCH_ASSOC);
+    public function migrate(){
+        $conn = connect_db();
 
-        return $resultset;
-    }
+        $query = "CREATE TABLE IF NOT EXISTS `{$this->table_name}`";
+        $fields = "`id` INT PRIMARY KEY AUTO_INCREMENT,";
 
-    //insert values to non-key-fields except for date_created and date_updated
-    public function insertRow($ordered_values){
-        $field_names = "";
-        $values = "";
-        for($i = 0; $i < sizeof($this->nonkey_fields); $i++){
-            
-            if($this->nonkey_fields[$i]->fieldName == "date_created") break;
-
-            $field_names = $field_names . ($i > 0 ? ", " : "") . $this->nonkey_fields[$i]->fieldName;
-            $values = $values . ($i > 0 ? ", " : "") . "'" . $ordered_values[$i] . "'";
+        //add user-defined fields
+        foreach($this->fields as $colName => $datatype){
+            $fields .= "\n`{$colName}` {$datatype},";
         }
 
-        $db = new Database();
-        $conn = $db->connect();
-        $sql = "INSERT INTO $this->model_name ($field_names) VALUES ($values);";
+        //add date-fields
+        $fields .= "\n`date_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,";
+        $fields .= "\n`date_updated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP";
+        
+        $stmt = "{$query} ({$fields}" . ($this->constraintCount > 0 ? ", {$this->constraints});" : ");");
 
-        echo $sql;
-        try{
-            $conn->exec($sql);
-        }catch(PDOException $e){
-            echo $e->getMessage();
-        }
 
-    } 
+        echo '<br>' . $this->table_name .':<p style="background-color: black; color: yellow;">' . $stmt . '</p>';
+
+        return $conn->exec($stmt);
+    }
+
+    protected function foreignKey($colname, $reference_table, $reference_colname){
+        $this->constraints .= ($this->constraintCount++ > 0 ? ",\n" : "") . "CONSTRAINT `FK_{$colname}_{$this->table_name}` FOREIGN KEY ({$colname}) REFERENCES {$reference_table}(`{$reference_colname}`) ON UPDATE CASCADE ON DELETE CASCADE \n";
+    }
+
+    public function get($colname){
+        return $this->row[$colname];
+    }
 }
-

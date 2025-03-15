@@ -2,11 +2,11 @@
     margin: 0px;
     padding: 0px;
     font-family: 'Inter';
-    font-weight: 600;
 }
 
 :root{
     --hl: #B8B8B8; /* highlights */
+    --dark-hl:#a1a1a1;
     --light-bg: #F5F5F5; 
     --blue: #4F82B1;
     --light-blue: #5b96ce;
@@ -139,7 +139,7 @@
 
 .auth-container{
     width: 350px;
-    height: 375px;
+    height: 475px;
     background-color: var( --white);
     border-radius: 25px;
     border: 1px solid var(--hl);

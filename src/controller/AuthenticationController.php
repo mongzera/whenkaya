@@ -13,19 +13,35 @@ class AuthenticationController extends BaseController{
 
         //create new user logic
         if(isPost()){
+            $firstname = cleanRequest($_POST['firstname']);
+            $lastname = cleanRequest($_POST['lastname']);
             $username = cleanRequest($_POST['username']);
             $password = cleanRequest($_POST['password']);
+            $email = cleanRequest($_POST['email']);
             $retype_password = cleanRequest($_POST['retype-password']);
 
             $hashed = password_hash($password, PASSWORD_DEFAULT);
 
             if(!($password === $retype_password)) echo "Password mismatch! $password != $retype_password";
-            
-            if(db_create_user($username, $hashed)){
+
+            $user = new UserModel();
+
+            if($user->insert([
+                'first_name' => $firstname,
+                'last_name' => $lastname,
+                'username' => $username,
+                'email' => $email,
+                'password_hashed' => $hashed
+            ])){
                 Auth::authenticate_user($username, $password);
                 redirect("dashboard");
-            
             }
+            
+            // if(db_create_user($username, $hashed)){
+            //     Auth::authenticate_user($username, $password);
+            //     redirect("dashboard");
+            
+            // }
         }
 
         $content = [
@@ -38,19 +54,6 @@ class AuthenticationController extends BaseController{
             "css" => ['css/global.css', 'css/theme.css', 'css/auth/auth.css'],
             "js"  => []
         ];
-
-        // $db = new Database();
-        // $db->createDatabase("test_orm_db");
-        // $db->setDatabase("test_orm_db");
-        
-        // $userModel = new UserModel();
-        // $db->createTable($userModel);
-
-        // $userModel->insertRow(["ethan", "gamat"]);
-        // $userModel->insertRow(["ethan2", "gamat2"]);
-        // $userModel->insertRow(["ethan3", "gamat3"]);
-        // $userModel->insertRow(["ethan4", "gamat4"]);
-        // $userModel->insertRow(["ethan5", "gamat5"]);
 
         render_page($content, $static);
     }

@@ -1,56 +1,64 @@
 (() => {
-    let updateScheduleList = () => {
-        let schedList = document.getElementById('schedule-list');
+
+    let updateCalendarList = () => {
         
-        $.post("/fetchuserschedule", null, (response, status) => {
-            if(response.status === 'success'){
-                schedList.innerHTML = "";
-                response.data.forEach(e => {
-                    let schedItem = document.createElement('a');
-                    schedItem.setAttribute("href", "#");
-                    schedItem.setAttribute("class", "schedule-item");
+        let calendar_list = document.getElementById('calendar-list');
+
+        $.post("/fetchusercalendars", null, (response, status) => {
+
+            if(status === 'success'){
+
+                calendar_list.innerHTML = "";
+                response.data['calendars'].forEach(e => {
+
+                    let calenderItem = document.createElement('a');
+                    calenderItem.setAttribute("href", "#");
+                    calenderItem.setAttribute("class", "schedule-item");
 
                     let text = document.createElement('h5');
-                    text.innerHTML = e[0];
-                    schedItem.appendChild(text);
+                    text.innerHTML = e['calendar_name'];
+                    calenderItem.appendChild(text);
 
-                    schedList.appendChild(schedItem);
+                    calendar_list.appendChild(calenderItem);
                 });
             }
         });
     }
 
     //add new schedule
-    let newScheduleBtn = document.getElementById('add-schedule-btn');
+    let newScheduleBtn = document.getElementById('add-calendar-btn');
     newScheduleBtn.onclick = () => {
         if(newScheduleBtn.hasAttribute('creating')) return;
         newScheduleBtn.toggleAttribute("creating");
-        let schedList = document.getElementById('schedule-list');
+        let calendarList = document.getElementById('calendar-list');
 
-        let schedNameInp = document.createElement('input'); //schedule name input
-        schedNameInp.setAttribute("class", "new-schedule-inp");
-        schedNameInp.setAttribute("type", "text");
-        schedList.appendChild(schedNameInp);
-        schedNameInp.focus();
+        let calendar_name_inp = document.createElement('input'); //schedule name input
+        calendar_name_inp.setAttribute("class", "new-schedule-inp");
+        calendar_name_inp.setAttribute("type", "text");
+        calendarList.appendChild(calendar_name_inp);
+        calendar_name_inp.focus();
 
-        schedList.addEventListener("keypress", (evt) => {
+        calendarList.addEventListener("keypress", (evt) => {
             if(evt.key !== 'Enter') return;
             //xmlhttprequest
-            let schedTitle = schedNameInp.value;
+            let calendar_name = calendar_name_inp.value;
             newScheduleBtn.removeAttribute('creating');
-            schedList.removeChild(schedNameInp);
+            calendarList.removeChild(calendar_name_inp);
             //console.log(schedTitle);
-            $.post("/addschedule", {
-                'schedule_title' : schedTitle
+            $.post("/addcalendar", {
+                'calendar_name' : calendar_name
             }, (data, status) => {
                 //alert("Data: " + data + "\nStatus: " + status);
                 
-                updateScheduleList();
+                updateCalendarList();
             });
 
+           
 
         });
     }
 
-    updateScheduleList();
+    updateCalendarList();
+
+
 })();

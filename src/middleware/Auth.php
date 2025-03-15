@@ -3,6 +3,7 @@
 namespace Src\Middleware;
 
 use PDOException;
+use Src\Model\UserModel;
 
 include_once "../src/utilities/db.util.php";
 include_once "../src/utilities/redirect.php";
@@ -20,48 +21,54 @@ class Auth{
     }
 
     public static function authenticate_user($username, $password){
-        $conn = connect_db();
-        $stmt = $conn->prepare("SELECT `password`, `user_id` FROM tb_basic_user_info WHERE `first_name` = '$username'");
-        $stmt->execute();
+        $user = new UserModel();
 
-        //what if first_name specified doesnt exist?
-        $rows = $stmt->fetchAll();
-        $columns = $rows[0];
-        if($columns == null) return false;
+        $row = $user->getColumn('username', $username);
 
-        $real_user_password = $columns['password']; //bcrypt encrypted
+        var_dump($row);
 
-        if(password_verify($password, $real_user_password)){
-            //login user
-            $userId = $columns['user_id'];
-            Auth::initialize($userId);
+        if($row == null) return false;
+
+        $hashed_password = $row['password_hashed'];
+
+        if(password_verify($password, $hashed_password)){
+            Auth::initialize($user);
             return true;
         }
 
-        echo 'Incorrect information!';
+        echo 'Incorrect Information';
         return false;
+
+
+        // $conn = connect_db();
+        // $stmt = $conn->prepare("SELECT `password`, `user_id` FROM tb_basic_user_info WHERE `first_name` = '$username'");
+        // $stmt->execute();
+
+        // //what if first_name specified doesnt exist?
+        // $rows = $stmt->fetchAll();
+        // $columns = $rows[0];
+        // if($columns == null) return false;
+
+        // $real_user_password = $columns['password']; //bcrypt encrypted
+
+        // if(password_verify($password, $real_user_password)){
+        //     //login user
+        //     $userId = $columns['user_id'];
+        //     Auth::initialize($userId);
+        //     return true;
+        // }
+
+        // echo 'Incorrect information!';
+        // return false;
 
     }
 
     //only call this function when you're sure the user logged in succesfully...
-    public static function initialize($userId){
-        $conn = connect_db();
+    public static function initialize($user){
         
-        $stmt = $conn->prepare("SELECT * FROM tb_basic_user_info WHERE `user_id` = '$userId';");
-        
-        try{
-            $stmt->execute();
-            $columns = $stmt->fetchAll()[0];
-
-            $_SESSION['user_authenticated'] = true;
-            $_SESSION['user_identification'] = $columns['user_id'];
-            $_SESSION['username'] = $columns['first_name'];
-
-
-        }catch(PDOException $e){
-            $errCode = $e->getCode();
-            //catch errors here
-        }
+        $_SESSION['user_authenticated'] = true;
+        $_SESSION['user_identification'] = $user->get('id');
+        $_SESSION['username'] = $user->get('username');
     }
 
     public static function getUsername(){

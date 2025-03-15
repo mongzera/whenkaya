@@ -3,6 +3,8 @@
 namespace Src\Controller;
 
 use Src\Middleware\Auth;
+use Src\Model\CalendarModel;
+use Src\Model\CalendarUserModel;
 
 class UserController extends BaseController{
     
@@ -17,14 +19,14 @@ class UserController extends BaseController{
         ];
 
         $static = [
-            "css" => ['css/global.css', 'css/theme.css', 'css/renzo.css'],
+            "css" => ['css/global.css', 'css/theme.css', 'css/dashboard.css'],
             "js"  => ['js/calendar.js', 'js/app.js']
         ];
 
         render_page($content, $static);
     }
 
-    public function addSchedule(){
+    public function addCalendar(){
         // if(!Auth::user()) {
         //     echo 'failed';
         //     exit();
@@ -33,24 +35,55 @@ class UserController extends BaseController{
         if(!isPost()) return;
         echo 'success';
         
-        $schedTitle = cleanRequest($_POST['schedule_title']);
-        if(!$schedTitle) echo 'failed';
+        $calendar_name = cleanRequest($_POST['calendar_name']);
+        if(!$calendar_name) echo 'failed';
         echo Auth::getUserId();
-        addCalendar($schedTitle, Auth::getUserId(), 0);
+
+        $calendar = new CalendarModel();
+        $calendar->insert([
+            'calendar_name' => $calendar_name
+        ]);
+
+        $calendarUserAssoc = new CalendarUserModel();
+        $calendarUserAssoc->insert([
+            'user_id' => Auth::getUserId(),
+            'calendar_id' => $calendar->get('id'),
+            'privilage_level' => 0
+        ]);
+
+
+
+        //insertNewCalendar($schedTitle, Auth::getUserId(), 0);
 
         //array_push(PublicController::$data, [$_POST['schedule_title'], '/uuid124123d12']);
     }
 
-    public function fetchUserSchedules(){
+    public function fetchUserCalendars(){
         header('Content-Type: application/json');
+
+        $userCalendarAssoc = new CalendarUserModel();
+
         $response = array(
             'status' => 'success',
             'message' => 'Data fetched successfully',
-            'data' => getAllCalendar(Auth::getUserId())
+            'data' => [
+                'calendars' => $userCalendarAssoc->getAllFromRelatedModel('tb_calendar_model', 'calendar_id', 'user_id', Auth::getUserId(), $select = 'calendar_name')
+            ]
         );
 
-        echo json_encode($response);
+        $out = json_encode($response);
+
+
+        echo $out;
         exit();
+    }
+
+    public function requestUserCards(){
+        if(!isPost()) return;
+
+        $date = cleanRequest($_POST['date']);
+
+        requestCardsForTheDate($date, Auth::getUserId());
     }
 }
 ?>

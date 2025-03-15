@@ -4,13 +4,14 @@ use Src\Middleware\Auth;
 
 ?>
 
-<div class="container flex flex-row">
+<div class="container flex flex-row" id='container'>
         <div class="sidebar px-1 border-right">
             <div class="profile flex align-center">
                 <h3><?php echo Auth::getUserName() ?></h3>
             </div>
             <div class="schedules">
-            <span class="flex flex-row justify-between align-center"><h3>Schedules</h3><button class='calendar-button' id='add-schedule-btn'>+</button></span>
+            <span class="flex flex-row justify-between align-center"><h3>Schedules</h3><button class='calendar-button' id='add-calendar-btn'>+</button></span>
+            <div id="calendar-list"></div>
             </div>
         </div>
 
@@ -28,23 +29,28 @@ use Src\Middleware\Auth;
                 </div>
 
             <div style="text-align: center; margin-top: 4px;">
-                <button class="dailynotes-button">+</button>
+                <button class="add-button" >+</button>
             </div>
 
             </div>
-            <div class="daily-scheduler container-padding">
+            
+            <div class="daily-scheduler container-padding flex flex-col">
                 <h3>Day Schedule</h3>
-                <div class="card-container">
-                    <div class="card">
-                        <p>Title Description </p>
-                        <p>Date Start</p>
-                        <p>Day End</p>
-                        <p>Reminder</p>
-                    </div>
+                <br>
+                <p class='current-date' id="current_date"></p>
+                <br>
+                <hr style="border: none; border-bottom: 0.5px solid black">
+                <!-- card containers here -->
+
+                <div id='cards_container' class="cards-container">
+                    
                 </div>
+
+
+                <!-- ends here-->
                   
-            <div style="text-align: center; margin-top: 4px;">
-                <button class="calendar-button" >+</button>
+            <div class='calendar-button-container flex justify-center'>
+                <button class="add-button" >+</button>
             </div>
                 
                 <!-- put a <h4> here, display the targeted date, year, month, day e.g 2024 November 14-->
