@@ -1,4 +1,4 @@
-<div class="auth-container ">
+<div class="auth-container flex flex-col">
     <form action="/create-account" method="POST">
         <p class='h2'>Create Account</p>
         <div class="auth-input-fields">
@@ -11,4 +11,10 @@
             <input type="submit" value="Create Account" class="auth-input-field auth-submit" />
         </div>
     </form>
+
+    <?php 
+    echo "<br>";
+    echo $content['error'];
+    
+    ?>
 </div>

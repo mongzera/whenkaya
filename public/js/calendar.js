@@ -1,9 +1,9 @@
 (() => {
 
-    let cardFactory = (timeStart, timeEnd, title, desc) => {
+    let cardFactory = (timeStart, timeEnd, title, desc, idx) => {
         let cardHTML = 
         `
-                    <div class="card flex flex-row align-center">
+                    <div class="card flex flex-row align-center" id='calendar-card-${idx}'>
                         <div class="time flex flex-col">
                             <div class="start-time flex justify-center">
                                 ${timeStart}
@@ -283,13 +283,15 @@
         }, (response, status) => {
             if(status !== 'success') return;
 
-            console.log(response.data);
+            console.log("REQUESTED CURRENT SCHEDULES");
 
             response.data["user_schedules"].forEach((element, i) => {
                 
                 if(element.calendar_id != _states.user_calendars[_states.current_calendar.id].id) return;
-                console.log('iter');
-                cardsContainer.innerHTML += cardFactory(element['schedule_start'], element['schedule_end'], element['schedule_title'], element['schedule_description']);
+                
+                cardsContainer.innerHTML += cardFactory(element['schedule_start'], element['schedule_end'], element['schedule_title'], element['schedule_description'], i);
+                let card = document.getElementById('calendar-card-' + i);
+                card.style.backgroundColor = `hsl(${element['color_hue']}, 55%, 70%)`;
             });
         });
 

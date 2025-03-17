@@ -76,25 +76,31 @@ let _states = {
     //add new schedule
     let newScheduleBtn = document.getElementById('add-calendar-btn');
     newScheduleBtn.onclick = () => {
+
         if(newScheduleBtn.hasAttribute('creating')) return;
         newScheduleBtn.toggleAttribute("creating");
-        let calendarList = document.getElementById('calendar-list');
 
+        let calendarList = document.getElementById('calendar-list');
         let calendar_name_inp = document.createElement('input'); //schedule name input
-        calendar_name_inp.setAttribute("class", "new-schedule-inp");
+        calendar_name_inp.setAttribute('id', 'new-calendar-inp')
+        calendar_name_inp.setAttribute("class", "new-calendar-inp");
         calendar_name_inp.setAttribute("type", "text");
         calendarList.appendChild(calendar_name_inp);
+        let idx = calendarList.children.length - 1;
         calendar_name_inp.focus();
-
-        calendarList.addEventListener("keypress", (evt) => {
-            if(evt.key !== 'Enter') return;
-            //xmlhttprequest
-            let calendar_name = calendar_name_inp.value;
-            newScheduleBtn.removeAttribute('creating');
+        
+        
+        calendar_name_inp.addEventListener('focusout', function handler()  {
+            
             calendarList.removeChild(calendar_name_inp);
-            //console.log(schedTitle);
+            newScheduleBtn.toggleAttribute("creating");
+        });
+
+        calendar_name_inp.addEventListener("keypress", (evt) => {
+            if(evt.key !== 'Enter') return;
+
             $.post("/addcalendar", {
-                'calendar_name' : calendar_name
+                'calendar_name' :  calendar_name_inp.value
             }, (data, status) => {
                 //alert("Data: " + data + "\nStatus: " + status);
                 
@@ -117,6 +123,7 @@ let _states = {
     let new_schedule_exit = document.getElementById('new-schedule-exit');
     new_schedule_exit.onclick = () => {
         toggleNewScheduleModal();
+        _states.updateDisplayDate();
     }
 
 
@@ -143,6 +150,9 @@ let _states = {
             console.log("SCHEDULE UPLOAD STATUS: " + status);
             console.log("DATA: " + data);
         });
+
+        toggleNewScheduleModal();
+        _states.updateDisplayDate();
     }
 
     let model_color_slider = document.getElementById('modal-color-slider');

@@ -13,6 +13,8 @@ class AuthenticationController extends BaseController{
 
         //create new user logic
         if(isPost()){
+
+
             $firstname = cleanRequest($_POST['firstname']);
             $lastname = cleanRequest($_POST['lastname']);
             $username = cleanRequest($_POST['username']);
@@ -20,21 +22,40 @@ class AuthenticationController extends BaseController{
             $email = cleanRequest($_POST['email']);
             $retype_password = cleanRequest($_POST['retype-password']);
 
+            
+            $isAllInputValid = true;
+            $error = "";
+
             $hashed = password_hash($password, PASSWORD_DEFAULT);
 
-            if(!($password === $retype_password)) echo "Password mismatch! $password != $retype_password";
+            if(!($password === $retype_password)) {
+                $error =  "<p style='color: red;'>Password mismatch!</p>";
+                $isAllInputValid = false;
+            }
 
-            $user = new UserModel();
+            if($firstname == ''){
+                $error =  "<p style='color: red;'>First name cannot be blank!</p>";
+                $isAllInputValid = false;
+            }
 
-            if($user->insert([
-                'first_name' => $firstname,
-                'last_name' => $lastname,
-                'username' => $username,
-                'email' => $email,
-                'password_hashed' => $hashed
-            ])){
-                Auth::authenticate_user($username, $password);
-                redirect("dashboard");
+            if($lastname == ''){
+                $error =  "<p style='color: red;'>Last Name cannot be blank!</p>";
+                $isAllInputValid = false;
+            }
+
+            if($isAllInputValid){
+                $user = new UserModel();
+
+                if($user->insert([
+                    'first_name' => $firstname,
+                    'last_name' => $lastname,
+                    'username' => $username,
+                    'email' => $email,
+                    'password_hashed' => $hashed
+                ])){
+                    Auth::authenticate_user($username, $password);
+                    redirect("dashboard");
+                }
             }
             
             // if(db_create_user($username, $hashed)){
@@ -47,7 +68,8 @@ class AuthenticationController extends BaseController{
         $content = [
             "title" => "Create Account",
             "head" => "../src/views/default_head.php",
-            "body" => "../src/views/auth/create-account.view.php"
+            "body" => "../src/views/auth/create-account.view.php",
+            "error" => $error
         ];
 
         $static = [

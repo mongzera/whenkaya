@@ -15,6 +15,10 @@
     height: 100px;
 }
 
+.calendar{
+    border-bottom: 1px solid var(--hl);
+}
+
 .calendar-list{
     border-top: 1.5px solid #000;
 }
@@ -46,7 +50,7 @@
     font-size: 0.95em;
 }
 
-.new-schedule-inp{
+.new-calendar-inp{
     width: 210;
     border-radius: 8px;
     padding: 8px 0px 8px 10px;
@@ -107,6 +111,14 @@
 
 .calendar-button-container{
     min-width: inherit;
+}
+
+.cards-container{
+    max-height: 50vh;
+    overflow-y: scroll;
+    margin: 20px 0px 20px 0px;
+    scrollbar-width: none;
+
 }
 
 .card{
