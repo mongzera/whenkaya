@@ -4,14 +4,44 @@ use Src\Middleware\Auth;
 
 ?>
 
+<div class="new-schedule-modal" id="new-schedule-modal" toggle='off'>
+    <div class="top flex justify-between align-center">
+        <h4 class='regular'>Add Schedule</h4>
+        <button class='new-schedule-exit' id='new-schedule-exit'>x</button>
+    </div><br>
+    <div class="content flex flex-col">
+        <input id='schedule-title-inp' class='basic-inp schedule-title-inp' type="text" placeholder="Title"/>
+        <textarea id='schedule-desc-inp' class='basic-inp schedule-desc-inp' type="text" placeholder="Description" rows='1'></textarea>
+        <p style='font-size: 0.7em' id='max-chars'></p>
+        <div class="time-set flex flex-row justify-between">
+            <div class="start-time-container">
+                <label>Start Time: </label>
+                <input id='schedule-starttime-inp' type="time"/>
+            </div>
+            <div class="end-time-container">
+                <label>End Time: </label>
+                <input id='schedule-endtime-inp' type="time"/>
+            </div>
+        </div>
+        <div class="footer flex flex-row justify-between align-center">
+            <div class="color flex flex-col justify-center">
+            <span><label>Card Color: </label><input id='modal-color-slider' type="range" min='0' max='360' value='0'/></span><div style='padding: 10px 5px;' id="color-out"></div>
+            </div>
+            <div class="submit-container">
+                <input type="submit" value="Create" class="create-schedule" id='create-schedule'/>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="container flex flex-row" id='container'>
         <div class="sidebar px-1 border-right">
             <div class="profile flex align-center">
                 <h3><?php echo Auth::getUserName() ?></h3>
             </div>
-            <div class="schedules">
-            <span class="flex flex-row justify-between align-center"><h3>Schedules</h3><button class='calendar-button' id='add-calendar-btn'>+</button></span>
-            <div id="calendar-list"></div>
+            <div class="calendars">
+                <span class="flex flex-row justify-between align-center"><h3>Calendars</h3><button class='calendar-button' id='add-calendar-btn'>+</button></span>
+                <div id="calendar-list" class="calendar-list flex flex-col"></div>
             </div>
         </div>
 
@@ -34,8 +64,8 @@ use Src\Middleware\Auth;
 
             </div>
             
-            <div class="daily-scheduler container-padding flex flex-col">
-                <h3>Day Schedule</h3>
+            <div id='schedules-view' class="daily-scheduler container-padding flex flex-col">
+                <p id='daily-scheduler-title' class='daily-scheduler-title'></p>
                 <br>
                 <p class='current-date' id="current_date"></p>
                 <br>
@@ -50,7 +80,7 @@ use Src\Middleware\Auth;
                 <!-- ends here-->
                   
             <div class='calendar-button-container flex justify-center'>
-                <button class="add-button" >+</button>
+                <button class="add-button" id='add-new-schedule'>+</button>
             </div>
                 
                 <!-- put a <h4> here, display the targeted date, year, month, day e.g 2024 November 14-->

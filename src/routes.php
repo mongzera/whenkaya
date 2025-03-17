@@ -18,6 +18,8 @@ function create_get_routes($router){
 
 function create_post_routes($router){
     $router->map("POST", "/addcalendar", 'UserController::addCalendar', 'addCalendarUser');
+    $router->map("POST", "/add-schedule", 'UserController::addSchedule', 'addScheduleUser');
+    $router->map("POST", "/requestuserschedules", "UserController::requestUserSchedules", "requestUserSchedules");
     $router->map("POST", "/fetchusercalendars", 'UserController::fetchUserCalendars', 'fetchusercalendars');
     $router->map("POST", "/create-account", "AuthenticationController::create_account", "create_account_post");
     $router->map("POST", "/login", "AuthenticationController::login_account", 'login_account_post');

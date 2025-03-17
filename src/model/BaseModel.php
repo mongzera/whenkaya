@@ -16,6 +16,7 @@ abstract class BaseModel{
     private $constraints;
     private $constraintCount = 0;
     private $row;
+    private $result_set;
 
     public function getId(int $id) : array{
         return $this->getColumn('id', $id);
@@ -29,9 +30,24 @@ abstract class BaseModel{
         $stmt = $conn->prepare($query);
         $stmt->execute();
 
-        $this->row = $stmt->fetchAll()[0];
+        
 
+        $this->row = $stmt->fetchAll()[0];
         return $this->row;
+    }
+
+    public function getAllWithColumn($columnname, $value){
+        $conn = connect_db();
+
+        $query = "SELECT * FROM {$this->table_name} WHERE `{$columnname}` = '{$value}'";
+
+        $stmt = $conn->prepare($query);
+        $stmt->execute();
+
+        $this->result_set = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $this->row = $this->result_set[0];
+
+        return $this->result_set;
     }
 
     public function getAllFromRelatedModel($model_name, $foreign_key, $target_column, $target_value, $select = "*"){
@@ -43,6 +59,8 @@ abstract class BaseModel{
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+
 
 
     public function insert($data){
@@ -94,4 +112,6 @@ abstract class BaseModel{
     public function get($colname){
         return $this->row[$colname];
     }
+
+
 }

@@ -1,4 +1,37 @@
+let _states = {
+    current_calendar : {
+        idx : 0,
+        id : 0
+    },
+    current_date : {
+        day : 0,
+        month : 0,
+        year : 1975
+    }
+};
+
 (() => {
+
+    
+    let toggleNewScheduleModal = () => {
+        //clear all input
+        let schedule_title_inp = document.getElementById('schedule-title-inp');
+        let schedule_desc_inp = document.getElementById('schedule-desc-inp');
+        let schedule_starttime_inp = document.getElementById('schedule-starttime-inp');
+        let schedule_endtime_inp = document.getElementById('schedule-endtime-inp');
+        let maxchars = document.getElementById('max-chars');
+
+        schedule_title_inp.value = "";
+        schedule_desc_inp.value = "";
+        schedule_starttime_inp.value = "";
+        schedule_endtime_inp.value = "";
+        maxchars.innerHTML = "";
+
+        let modal = document.getElementById('new-schedule-modal');
+        
+        modal.setAttribute('toggle', (modal.getAttribute('toggle') == 'off') ? 'on' : 'off');
+
+    }
 
     let updateCalendarList = () => {
         
@@ -9,20 +42,35 @@
             if(status === 'success'){
 
                 calendar_list.innerHTML = "";
+                _states.user_calendars = response.data['calendars'];
                 response.data['calendars'].forEach(e => {
 
-                    let calenderItem = document.createElement('a');
-                    calenderItem.setAttribute("href", "#");
-                    calenderItem.setAttribute("class", "schedule-item");
+                    let calendarItem = document.createElement('a');
+                    calendarItem.setAttribute("href", "#");
+                    calendarItem.setAttribute("class", "calendar-item");
+                    calendarItem.setAttribute('calendar-idx', calendar_list.children.length);
+                    calendarItem.setAttribute('selected', 'false');
+                    calendarItem.onclick = () => {
+                        calendar_list.childNodes[_states.current_calendar.idx].setAttribute('selected', false);
+                        selectCalendar(calendarItem);
+                        calendarItem.setAttribute('selected', 'true');
+                        _states.updateDisplayDate()
+                    }
 
-                    let text = document.createElement('h5');
-                    text.innerHTML = e['calendar_name'];
-                    calenderItem.appendChild(text);
+                    calendarItem.innerHTML = e['calendar_name'];
 
-                    calendar_list.appendChild(calenderItem);
+                    calendar_list.appendChild(calendarItem);
+
+                    if(calendar_list.children.length == 1) selectCalendar(calendarItem);
                 });
             }
         });
+    }
+
+    let selectCalendar = (calendarItem) => {
+        _states.current_calendar.id = parseInt(calendarItem.getAttribute('calendar-idx'));
+        _states.current_calendar.idx = calendarItem.getAttribute('calendar-idx');
+        _states.current_calendar.name = calendarItem.innerHTML;
     }
 
     //add new schedule
@@ -59,6 +107,64 @@
     }
 
     updateCalendarList();
+
+    let new_schedule_button = document.getElementById('add-new-schedule');
+
+    new_schedule_button.onclick = () => {
+        toggleNewScheduleModal();
+    }
+
+    let new_schedule_exit = document.getElementById('new-schedule-exit');
+    new_schedule_exit.onclick = () => {
+        toggleNewScheduleModal();
+    }
+
+
+    let new_schedule_submit = document.getElementById('create-schedule');
+    new_schedule_submit.onclick = () => {
+
+        //clear all input
+        let schedule_title_inp = document.getElementById('schedule-title-inp');
+        let schedule_desc_inp = document.getElementById('schedule-desc-inp');
+        let schedule_starttime_inp = document.getElementById('schedule-starttime-inp');
+        let schedule_endtime_inp = document.getElementById('schedule-endtime-inp');
+        let maxchars = document.getElementById('max-chars');
+        let model_color_slider = document.getElementById('modal-color-slider');
+
+        $.post("/add-schedule", {
+            'schedule_title' : schedule_title_inp.value,
+            'schedule_description' : schedule_desc_inp.value,
+            'schedule_start' : schedule_starttime_inp.value,
+            'schedule_end' : schedule_endtime_inp.value,
+            'schedule_type' : 0,
+            'color_hue' : model_color_slider.value,
+            'calendar_id' : _states.user_calendars[_states.current_calendar.id]['id']
+        }, (data, status) => {
+            console.log("SCHEDULE UPLOAD STATUS: " + status);
+            console.log("DATA: " + data);
+        });
+    }
+
+    let model_color_slider = document.getElementById('modal-color-slider');
+    model_color_slider.addEventListener('input', ()=>{
+        let color_out = document.getElementById('color-out');
+        color_out.style.backgroundColor = `hsl(${model_color_slider.value}, 55%, 70%)`;
+    });
+
+    //limit desc chars
+    let schedule_desc_inp = document.getElementById('schedule-desc-inp');
+    schedule_desc_inp.addEventListener('input', () => {
+        console.log('test');
+        let maxChars = 200;
+
+        if (schedule_desc_inp.value.length >= maxChars) {
+            schedule_desc_inp.value = schedule_desc_inp.value.substring(0, maxChars); // Prevent extra input
+        }
+
+        let maxchars = document.getElementById('max-chars');
+
+        maxchars.innerHTML = `Character Limit: ${schedule_desc_inp.value.length} / ${maxChars}`;
+    });
 
 
 })();
