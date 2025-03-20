@@ -109,10 +109,5 @@
         let calendarState = new CalendarState();
         
         setInterval(() => {calendarState.draw()}, 100); //apparently, u have to put it in anon-function for it to be called ¯\_(ツ)_/¯
-
-        // setInterval(() => {
-        
-        //     calendarState.nextMonth();
-        // }, 1000);
     }
 })();

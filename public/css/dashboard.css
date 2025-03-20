@@ -2,6 +2,95 @@
     display: none;
 }
 
+<<<<<<< Updated upstream
+=======
+#schedules-view{
+    display: none;
+}
+
+.sidebar{
+    min-width: 200px;
+    height: 100vh;
+}
+
+.profile{
+    height: 100px;
+}
+
+.calendar{
+    border-bottom: 1px solid var(--hl);
+}
+
+.calendar-list{
+    border-top: 1.5px solid #000;
+}
+
+.calendars h3{
+    margin: 15px 0px 15px 0px;
+}
+
+.daily-scheduler-title{
+    font-size: 1.2em;
+}
+
+.calendar-item{
+    font-size: 0.9em;
+    font-weight: 300;
+    text-decoration: none;
+    color: #000;
+    padding: 10px 0px 10px 12px;
+    border-radius: 8px;
+    margin: 1px;
+    
+}
+
+.calendar-item[selected="true"]{
+    border: 0.5px solid var(--dark-hl);
+}
+
+.calendar-item p{
+    font-size: 0.95em;
+}
+
+.new-calendar-inp{
+    width: 210;
+    border-radius: 8px;
+    padding: 8px 0px 8px 10px;
+    outline: none;
+}
+
+.container-padding{
+    padding: 40px 50px 0px 50px;
+}
+
+.schedule-item-selected{
+    background-color: var(--light-bg);
+}
+
+.calendar-view{
+    padding: 20px 0px 0px 0px;
+}
+
+.calendar-button{
+    font-size: 1.5em;
+    font-weight: 300;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    width: 35px;
+
+}
+
+.calendar-button:hover{
+    border: 1px solid var(--hl);
+}
+
+.calendar-button:active{
+    background-color: var(--hl);
+}
+
+>>>>>>> Stashed changes
 .daily-scheduler{
     min-width: 400px;
 }

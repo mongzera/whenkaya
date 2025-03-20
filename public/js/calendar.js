@@ -82,10 +82,12 @@
 
             this.prevMonthBtn.onclick = () => {
                 this.prevMonth();
+                updateDisplayDate();
             }
 
             this.nextMonthBtn.onclick = () => {
                 this.nextMonth();
+                updateDisplayDate();
             }
 
             this.setTargetDate(new Date());
@@ -104,6 +106,7 @@
 
         //implement lerping for this, make it smooooth
         _hoverData = {
+
             //listenToHover : true,
             outlinePad : 20,
             currentX : 0,
@@ -115,6 +118,7 @@
         }
 
         setTargetDate(dateObject){
+
             if(dateObject == null) return;
 
             this._targetDate.day = dateObject.getDate();
@@ -160,6 +164,7 @@
         }
 
         _lerpAnimation = (ctx) => {
+
             if(!this.shouldAnimateHoverBorder) return;
 
             //animate date hovering
@@ -176,8 +181,23 @@
         
         }
 
+        drawCardCircleColor = (midX, midY, outlinePad, hue) => {
+            ctx.fillStyle = `hsl(${hue}, 55%, 70%)`;
+            //ctx.fillStyle = "red";
+            ctx.beginPath();
+            ctx.arc(midX - outlinePad + 5, midY - outlinePad + 2 * outlinePad  - 5, 2.5, 0,  2 * Math.PI);
+            ctx.fill();
+
+        }   
+
         draw = () => {
+<<<<<<< Updated upstream
             //console.log('update');
+=======
+            //console.log('update');]
+            ctx.imageSmoothingEnabled = false;
+            //ctx.imageSmoothingQuality
+>>>>>>> Stashed changes
 
             this.shouldAnimateHoverBorder = mousePosition.wasInsideCalendar;
             
@@ -204,8 +224,6 @@
                 ctx.fillText(this.days[i], i * daySpacing + daySpacing*0.5 - 8, 30);
             }
 
-
-
             ctx.font = "400 16px Inter"; //set it back to thin
             for(let i = 0; i < 6 * 7; i++){
                 
@@ -213,13 +231,6 @@
                 let textDim = measureText(ctx, day.getDate());
                 let x = i % this.days.length;
                 let y = Math.floor(i/this.days.length);
-
-                ctx.fillStyle = "#000";
-                let isDayWitinTargetMonth = true;
-                if(dayOffset + i < 1 || dayOffset + i > monthDays) {
-                    ctx.fillStyle = "#B8B8B8";
-                    isDayWitinTargetMonth = false;
-                }
 
                 let pad = 15;
                 let textX = x * daySpacing + 40 - textDim.width;
@@ -229,10 +240,41 @@
 
                 let midX = textX + textW*0.5;
                 let midY = textY - textH*0.5;
-
                 let outlinePad = 20;
 
+                //check for schedules on a day
+                let schedExists = typeof _states.user_schedules?.[_states.user_calendars?.[_states.current_calendar?.id]?.id]?.[_states.current_date?.year]?.[_states.current_date?.month]?.[day.getDate()] !== 'undefined';
+
+                //console.log(schedExists);
+                
+                ctx.fillStyle = "#000";
+                let isDayWitinTargetMonth = true;
+                if(dayOffset + i < 1 || dayOffset + i > monthDays) {
+                    ctx.fillStyle = "#B8B8B8";
+                    isDayWitinTargetMonth = false;
+                }
+
                 ctx.fillText(day.getDate(), textX , textY);
+
+                if(schedExists && isDayWitinTargetMonth){
+                    let schedules = _states.user_schedules[_states.user_calendars[_states.current_calendar.id].id][_states.current_date.year][_states.current_date.month][day.getDate()];
+
+                    let schedCount = Object.keys(schedules).length;
+                        
+
+                    let circleCount = schedCount >= 5 ? 5 : schedCount;
+
+                    for(let j = 0; j < circleCount; j++){
+                        let schedColor = Object.values(schedules)[j]['color_hue'];
+                        this.drawCardCircleColor(midX + j * 6, midY, outlinePad, schedColor);
+                    }
+                }
+
+                //this.drawCardCircleColor(midX, midY, outlinePad, 234);
+
+                
+
+                
 
                 if( this.isDayBeingHovered(midX - outlinePad, midY - outlinePad, 2 * outlinePad, 2 * outlinePad) ){
                     this._hoverData.currentX = midX;
@@ -274,6 +316,15 @@
 
     }
 
+<<<<<<< Updated upstream
+=======
+    let calendarState = new CalendarState();
+
+    let extractCardDate = (card) => {
+        return card['schedule_date'].split(' ')[0].split('-');
+    }
+
+>>>>>>> Stashed changes
     let updateCurrentDateCards = (currentDate) => {
 
         $.post("/requestusercards", {
@@ -289,9 +340,82 @@
         //clear
         cardsContainer.innerHTML = "";
 
+<<<<<<< Updated upstream
         for(let i = 0; i < 5; i++){
             cardsContainer.innerHTML += cardFactory("4:10 AM", "11:00 PM", "TEST TITLE", "TEST DESCRIPTION");
         }
+=======
+        if(_states.user_calendars === undefined || _states.user_calendars.length == 0) return;
+
+        let checkDate = (currentDate, card) => {
+            
+            let date_arr = extractCardDate(card);
+            let year = parseInt(date_arr[0]);
+            let month = parseInt(date_arr[1]) - 1; //Javascript Date-Month is based 0 [0] = "January"
+            let day = parseInt(date_arr[2]);
+
+            return currentDate.year == year && currentDate.month == month && currentDate.day == day; 
+        }
+
+        let _statesUpdateUserSchedule = (card) => {
+            let card_date = extractCardDate(card);
+            let year = parseInt(card_date[0]);
+            let month = parseInt(card_date[1]) - 1; //Javascript Date-Month is based 0 [0] = "January"
+            let day = parseInt(card_date[2]);
+
+            let id = card['calendar_id'];
+
+            if(typeof _states.user_schedules == 'undefined'){
+                _states.user_schedules = {};
+            }
+
+            if(typeof _states.user_schedules[id] == 'undefined'){
+                _states.user_schedules[id] = {};
+            }
+
+            if(typeof _states.user_schedules[id][year] == 'undefined'){
+                _states.user_schedules[id][year] = {};
+            }
+
+            if(typeof _states.user_schedules[id][year][month] == 'undefined'){
+                _states.user_schedules[id][year][month] = {};
+            }
+
+            if(typeof _states.user_schedules[id][year][month][day] == 'undefined'){
+                _states.user_schedules[id][year][month][day] = {};
+            }
+
+           
+            _states.user_schedules[id][year][month][day][card.id] = card;
+        }
+
+        
+        $.post("/requestuserschedules", {
+            'calendar_id' : _states.user_calendars[_states.current_calendar.id]['id']
+        }, (response, status) => {
+            if(status !== 'success') return;
+
+            console.log("REQUESTED CURRENT SCHEDULES");
+
+            response.data["user_schedules"].forEach((element, i) => {
+
+                _statesUpdateUserSchedule(element);
+                
+                if(element.calendar_id != _states.user_calendars[_states.current_calendar.id].id) return; //check date
+                if(!checkDate(_states.current_date, element)) return;
+                
+                
+                cardsContainer.innerHTML += cardFactory(element['schedule_start'], element['schedule_end'], element['schedule_title'], element['schedule_description'], i);
+                let card = document.getElementById('calendar-card-' + i);
+                card.style.backgroundColor = `hsl(${element['color_hue']}, 55%, 70%)`;
+            });
+        });
+
+        
+        // for(let i = 0; i < 5; i++){
+        //     cardsContainer.innerHTML += cardFactory("4:10 AM", "11:00 PM", "TEST TITLE", "TEST DESCRIPTION");
+        // }
+>>>>>>> Stashed changes
     }
 
     let updateDisplayDate = (calendarState) => {

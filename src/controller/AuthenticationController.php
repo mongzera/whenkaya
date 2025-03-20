@@ -12,6 +12,7 @@ class AuthenticationController extends BaseController{
         if(Auth::user()) redirect("dashboard");
 
         //create new user logic
+        $error = "";
         if(isPost()){
             $firstname = cleanRequest($_POST['firstname']);
             $lastname = cleanRequest($_POST['lastname']);
@@ -20,6 +21,13 @@ class AuthenticationController extends BaseController{
             $email = cleanRequest($_POST['email']);
             $retype_password = cleanRequest($_POST['retype-password']);
 
+<<<<<<< Updated upstream
+=======
+            
+            $isAllInputValid = true;
+            
+
+>>>>>>> Stashed changes
             $hashed = password_hash($password, PASSWORD_DEFAULT);
 
             if(!($password === $retype_password)) echo "Password mismatch! $password != $retype_password";
