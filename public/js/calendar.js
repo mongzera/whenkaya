@@ -1,9 +1,9 @@
 (() => {
 
-    let cardFactory = (timeStart, timeEnd, title, desc) => {
+    let cardFactory = (timeStart, timeEnd, title, desc, idx) => {
         let cardHTML = 
         `
-                    <div class="card flex flex-row align-center">
+                    <div class="card flex flex-row align-center" id='calendar-card-${idx}'>
                         <div class="time flex flex-col">
                             <div class="start-time flex justify-center">
                                 ${timeStart}
@@ -36,6 +36,7 @@
     canvas.setAttribute("id", "calendar");
     cldnrCtn.appendChild(canvas);
     let ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
     let dt = 0;
 
     let measureText = (ctx, text) => {
@@ -191,13 +192,9 @@
         }   
 
         draw = () => {
-<<<<<<< Updated upstream
-            //console.log('update');
-=======
             //console.log('update');]
             ctx.imageSmoothingEnabled = false;
             //ctx.imageSmoothingQuality
->>>>>>> Stashed changes
 
             this.shouldAnimateHoverBorder = mousePosition.wasInsideCalendar;
             
@@ -281,17 +278,8 @@
                     this._hoverData.currentY = midY;
                     this._hoverData.isHoveredDayInTargetMonth = isDayWitinTargetMonth;
                     this._hoverData.dateInfo = day;
-                    console.log("DAY IS HOVERED!");
-                    // ctx.fillStyle = "#0f0";
-                    // ctx.beginPath();
-                    // ctx.ellipse(midX, midY, 5, 5, 0, 0, Math.PI*2, false);
-                    // ctx.fill();
+                    //console.log("DAY IS HOVERED!");
 
-                    // ctx.strokeStyle = "#B8B8B8";
-                    // ctx.lineWidth = 2;
-                    // ctx.beginPath();
-                    // ctx.roundRect(midX - outlinePad, midY - outlinePad, 2 * outlinePad, 2 * outlinePad, 5);
-                    // ctx.stroke();
                 }
 
                 //if target date, draw a red outline
@@ -316,35 +304,17 @@
 
     }
 
-<<<<<<< Updated upstream
-=======
     let calendarState = new CalendarState();
 
     let extractCardDate = (card) => {
         return card['schedule_date'].split(' ')[0].split('-');
     }
 
->>>>>>> Stashed changes
     let updateCurrentDateCards = (currentDate) => {
-
-        $.post("/requestusercards", {
-            'date' : {'day': currentDate.day, 'month': currentDate.month, 'year': currentDate.year}
-        }, (data, status) => {
-            //alert("Data: " + data + "\nStatus: " + status);
-            
-            //updateCalendarList();
-        });
-
         let cardsContainer = document.getElementById('cards_container');
-
         //clear
         cardsContainer.innerHTML = "";
 
-<<<<<<< Updated upstream
-        for(let i = 0; i < 5; i++){
-            cardsContainer.innerHTML += cardFactory("4:10 AM", "11:00 PM", "TEST TITLE", "TEST DESCRIPTION");
-        }
-=======
         if(_states.user_calendars === undefined || _states.user_calendars.length == 0) return;
 
         let checkDate = (currentDate, card) => {
@@ -415,33 +385,58 @@
         // for(let i = 0; i < 5; i++){
         //     cardsContainer.innerHTML += cardFactory("4:10 AM", "11:00 PM", "TEST TITLE", "TEST DESCRIPTION");
         // }
->>>>>>> Stashed changes
     }
 
-    let updateDisplayDate = (calendarState) => {
+    let updateDisplayDate = () => {
         let dashboard_date_display = document.getElementById('current_date');
-        let current_date = calendarState._targetDate;
-        dashboard_date_display.innerHTML = calendarState.months[current_date.month] + " " + current_date.day + ", " + current_date.year;
+        let dashboard_daily_sched_title = document.getElementById('daily-scheduler-title');
 
-        updateCurrentDateCards(calendarState._targetDate);
+        //update the global _states here...
+        _states.current_date.day = calendarState._targetDate.day;
+        _states.current_date.month = calendarState._targetDate.month;
+        _states.current_date.year = calendarState._targetDate.year;
+        let calendar_list = document.getElementById('calendar-list');
+
+        if(_states.current_calendar.name === undefined && calendar_list.childNodes.length > 0){
+            
+            let calendarItem = calendar_list.childNodes[0];
+            _states.current_calendar.idx = calendarItem.getAttribute('calendar-idx');
+            _states.current_calendar.name = calendarItem.innerHTML;
+        }
+
+        dashboard_daily_sched_title.innerHTML = "Day schedule for " +  "<b>" + _states.current_calendar.name +  "</b>";
+        dashboard_date_display.innerHTML = calendarState.months[_states.current_date.month] + " " + _states.current_date.day + ", " + _states.current_date.year;
+        
+        //show schedules view if there are calendars
+        if(_states.user_calendars !== undefined && _states.user_calendars.length > 0) showSchedulesView();
+        
+        updateCurrentDateCards(_states.current_date);
     }
 
     let showAll = () => {
         let container = document.getElementById("container");
-
         container.style.display = "flex";
+    }
+
+    let showSchedulesView = () => {
+        let schedules_view = document.getElementById("schedules-view");
+        schedules_view.style.display = "flex";
     }
 
 
     window.onload = () =>{
-        let calendarState = new CalendarState();
+        
         
         setInterval(() => {
             calendarState.draw()
-
+            
         }, 1000 / 144); //apparently, u have to put it in anon-function for it to be called ¯\_(ツ)_/¯
 
-        updateDisplayDate(calendarState);
+        _states.updateDisplayDate = updateDisplayDate;
+
+        _states.updateDisplayDate();
+
+        
         showAll();
 
         //mousemove listener
@@ -460,8 +455,7 @@
         canvas.addEventListener("mousedown", (evt) => {
             console.log("pressed");
             calendarState.setTargetDate(calendarState._hoverData.dateInfo);
-
-            updateDisplayDate(calendarState);
+            _states.updateDisplayDate();
         });
 
         //set calendarState.setTargetDate

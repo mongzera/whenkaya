@@ -1,4 +1,37 @@
+let _states = {
+    current_calendar : {
+        idx : 0,
+        id : 0
+    },
+    current_date : {
+        day : 0,
+        month : 0,
+        year : 1975
+    }
+};
+
 (() => {
+
+    
+    let toggleNewScheduleModal = () => {
+        //clear all input
+        let schedule_title_inp = document.getElementById('schedule-title-inp');
+        let schedule_desc_inp = document.getElementById('schedule-desc-inp');
+        let schedule_starttime_inp = document.getElementById('schedule-starttime-inp');
+        let schedule_endtime_inp = document.getElementById('schedule-endtime-inp');
+        let maxchars = document.getElementById('max-chars');
+
+        schedule_title_inp.value = "";
+        schedule_desc_inp.value = "";
+        schedule_starttime_inp.value = "";
+        schedule_endtime_inp.value = "";
+        maxchars.innerHTML = "";
+
+        let modal = document.getElementById('new-schedule-modal');
+        
+        modal.setAttribute('toggle', (modal.getAttribute('toggle') == 'off') ? 'on' : 'off');
+
+    }
 
     let updateCalendarList = () => {
         
@@ -9,13 +42,9 @@
             if(status === 'success'){
 
                 calendar_list.innerHTML = "";
+                _states.user_calendars = response.data['calendars'];
                 response.data['calendars'].forEach(e => {
 
-<<<<<<< Updated upstream
-                    let calenderItem = document.createElement('a');
-                    calenderItem.setAttribute("href", "#");
-                    calenderItem.setAttribute("class", "schedule-item");
-=======
                     let calendarItem = document.createElement('a');
                     calendarItem.setAttribute("href", "#");
                     calendarItem.setAttribute("class", "calendar-item");
@@ -26,20 +55,17 @@
                         selectCalendar(calendarItem);
                         _states.updateDisplayDate()
                     }
->>>>>>> Stashed changes
 
-                    let text = document.createElement('h5');
-                    text.innerHTML = e['calendar_name'];
-                    calenderItem.appendChild(text);
+                    calendarItem.innerHTML = e['calendar_name'];
 
-                    calendar_list.appendChild(calenderItem);
+                    calendar_list.appendChild(calendarItem);
+
+                    if(calendar_list.children.length == 1) selectCalendar(calendarItem);
                 });
             }
         });
     }
 
-<<<<<<< Updated upstream
-=======
     let selectCalendar = (calendarItem) => {
         _states.current_calendar.id = parseInt(calendarItem.getAttribute('calendar-idx'));
         _states.current_calendar.idx = calendarItem.getAttribute('calendar-idx');
@@ -47,29 +73,34 @@
         calendarItem.setAttribute('selected', 'true');
     }
 
->>>>>>> Stashed changes
     //add new schedule
     let newScheduleBtn = document.getElementById('add-calendar-btn');
     newScheduleBtn.onclick = () => {
+
         if(newScheduleBtn.hasAttribute('creating')) return;
         newScheduleBtn.toggleAttribute("creating");
-        let calendarList = document.getElementById('calendar-list');
 
+        let calendarList = document.getElementById('calendar-list');
         let calendar_name_inp = document.createElement('input'); //schedule name input
-        calendar_name_inp.setAttribute("class", "new-schedule-inp");
+        calendar_name_inp.setAttribute('id', 'new-calendar-inp')
+        calendar_name_inp.setAttribute("class", "new-calendar-inp");
         calendar_name_inp.setAttribute("type", "text");
         calendarList.appendChild(calendar_name_inp);
+        let idx = calendarList.children.length - 1;
         calendar_name_inp.focus();
-
-        calendarList.addEventListener("keypress", (evt) => {
-            if(evt.key !== 'Enter') return;
-            //xmlhttprequest
-            let calendar_name = calendar_name_inp.value;
-            newScheduleBtn.removeAttribute('creating');
+        
+        
+        calendar_name_inp.addEventListener('focusout', function handler()  {
+            
             calendarList.removeChild(calendar_name_inp);
-            //console.log(schedTitle);
+            newScheduleBtn.toggleAttribute("creating");
+        });
+
+        calendar_name_inp.addEventListener("keypress", (evt) => {
+            if(evt.key !== 'Enter') return;
+
             $.post("/addcalendar", {
-                'calendar_name' : calendar_name
+                'calendar_name' :  calendar_name_inp.value
             }, (data, status) => {
                 //alert("Data: " + data + "\nStatus: " + status);
                 
@@ -83,8 +114,6 @@
 
     updateCalendarList();
 
-<<<<<<< Updated upstream
-=======
     let new_schedule_button = document.getElementById('add-new-schedule');
 
     new_schedule_button.onclick = () => {
@@ -152,6 +181,5 @@
         maxchars.innerHTML = `Character Limit: ${schedule_desc_inp.value.length} / ${maxChars}`;
     });
 
->>>>>>> Stashed changes
 
 })();

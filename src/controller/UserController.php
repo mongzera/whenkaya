@@ -5,6 +5,7 @@ namespace Src\Controller;
 use Src\Middleware\Auth;
 use Src\Model\CalendarModel;
 use Src\Model\CalendarUserModel;
+use Src\Model\ScheduleModel;
 
 class UserController extends BaseController{
     
@@ -37,7 +38,6 @@ class UserController extends BaseController{
         
         $calendar_name = cleanRequest($_POST['calendar_name']);
         if(!$calendar_name) echo 'failed';
-        echo Auth::getUserId();
 
         $calendar = new CalendarModel();
         $calendar->insert([
@@ -58,8 +58,6 @@ class UserController extends BaseController{
         //array_push(PublicController::$data, [$_POST['schedule_title'], '/uuid124123d12']);
     }
 
-<<<<<<< Updated upstream
-=======
     public function addSchedule(){
         if(!isPost()) return;
 
@@ -109,7 +107,6 @@ class UserController extends BaseController{
         // ]);
     }
     
->>>>>>> Stashed changes
     public function fetchUserCalendars(){
         header('Content-Type: application/json');
 
@@ -119,7 +116,7 @@ class UserController extends BaseController{
             'status' => 'success',
             'message' => 'Data fetched successfully',
             'data' => [
-                'calendars' => $userCalendarAssoc->getAllFromRelatedModel('tb_calendar_model', 'calendar_id', 'user_id', Auth::getUserId(), $select = 'calendar_name')
+                'calendars' => $userCalendarAssoc->getAllFromRelatedModel('tb_calendar_model', 'calendar_id', 'user_id', Auth::getUserId(), $select = 'tb_calendar_model.id, calendar_name')
             ]
         );
 
@@ -130,12 +127,40 @@ class UserController extends BaseController{
         exit();
     }
 
-    public function requestUserCards(){
+
+
+    public function requestUserSchedules(){
         if(!isPost()) return;
 
-        $date = cleanRequest($_POST['date']);
+        $calendar_id = cleanRequest($_POST['calendar_id']);
 
-        requestCardsForTheDate($date, Auth::getUserId());
+        $calendarUserAssoc = new CalendarUserModel();
+        $canView = false;
+        $results = $calendarUserAssoc->getAllWithColumn('user_id', Auth::getUserId());
+
+        foreach($results as $row){
+            if($row['calendar_id'] == $calendar_id){
+                $canView = ($row['privilage_level'] <= 1);
+                break;
+            }
+        }
+
+        if(!$canView) exit();
+
+        $scheduleModel = new ScheduleModel();
+
+        header('Content-Type: application/json');
+        $response = array(
+            'status' => 'success',
+            'message' => 'Data fetched successfully',
+            'data' => [
+                'user_schedules' => $scheduleModel->getAllWithColumn('calendar_id', $calendar_id),
+                'help' => 'test'
+            ]
+        );
+
+        echo json_encode($response);
+        exit();
     }
 }
 ?>

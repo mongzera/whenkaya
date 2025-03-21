@@ -2,8 +2,6 @@
     display: none;
 }
 
-<<<<<<< Updated upstream
-=======
 #schedules-view{
     display: none;
 }
@@ -90,7 +88,6 @@
     background-color: var(--hl);
 }
 
->>>>>>> Stashed changes
 .daily-scheduler{
     min-width: 400px;
 }
@@ -114,6 +111,14 @@
 
 .calendar-button-container{
     min-width: inherit;
+}
+
+.cards-container{
+    max-height: 50vh;
+    overflow-y: scroll;
+    margin: 20px 0px 20px 0px;
+    scrollbar-width: none;
+
 }
 
 .card{
@@ -157,4 +162,65 @@
 .card .time .end-time{
     font-weight: 300;
     padding: 5px;
+}
+
+.new-schedule-modal{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -70%);
+    width: 400px;
+    height: 300px;
+    z-index: 10000;
+    background-color: var(--white);
+    box-shadow: 1px 1px 15px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 25px;
+    padding: 25px;
+}
+
+.schedule-title-inp{
+    width: inherit;
+}
+.schedule-desc-inp{
+    width: inherit;
+    height: 100px;
+    resize: none;
+    padding-top: 10px;
+}
+
+.new-schedule-modal[toggle='off']{
+    display: none;
+}
+
+.new-schedule-exit{
+    padding: 5px;
+    border-radius: 5px;
+    background-color: transparent;
+    border: 2px solid transparent;
+}
+
+.new-schedule-modal .footer{
+    height: 80px;
+}
+
+.new-schedule-exit:hover{
+    border: 2px solid var(--dark-hl);
+}
+
+.create-schedule{
+    width: 80px;
+    height: 35px;
+    background-color: var(--blue)  !important;
+    color: var(--white)  !important;
+    font-size: 0.8em !important;
+    border: 0px !important;
+    padding: 0px !important;
+}
+
+.create-schedule:hover{
+    background-color: var(--light-blue) !important;
+}
+
+.create-schedule:active{
+    background-color: var(--dark-blue)  !important;
 }
