@@ -33,26 +33,7 @@ let _states = {
 
     }
 
-    
-    let toggleNewScheduleModal = () => {
-        //clear all input
-        let schedule_title_inp = document.getElementById('schedule-title-inp');
-        let schedule_desc_inp = document.getElementById('schedule-desc-inp');
-        let schedule_starttime_inp = document.getElementById('schedule-starttime-inp');
-        let schedule_endtime_inp = document.getElementById('schedule-endtime-inp');
-        let maxchars = document.getElementById('max-chars');
 
-        schedule_title_inp.value = "";
-        schedule_desc_inp.value = "";
-        schedule_starttime_inp.value = "";
-        schedule_endtime_inp.value = "";
-        maxchars.innerHTML = "";
-
-        let modal = document.getElementById('new-schedule-modal');
-        
-        modal.setAttribute('toggle', (modal.getAttribute('toggle') == 'off') ? 'on' : 'off');
-
-    }
 
     let updateCalendarList = () => {
         
