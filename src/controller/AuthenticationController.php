@@ -12,6 +12,7 @@ class AuthenticationController extends BaseController{
         if(Auth::user()) redirect("dashboard");
 
         //create new user logic
+        $error = "";
         if(isPost()){
 
 
@@ -24,7 +25,7 @@ class AuthenticationController extends BaseController{
 
             
             $isAllInputValid = true;
-            $error = "";
+            
 
             $hashed = password_hash($password, PASSWORD_DEFAULT);
 

@@ -33,6 +33,27 @@ let _states = {
 
     }
 
+    
+    let toggleNewScheduleModal = () => {
+        //clear all input
+        let schedule_title_inp = document.getElementById('schedule-title-inp');
+        let schedule_desc_inp = document.getElementById('schedule-desc-inp');
+        let schedule_starttime_inp = document.getElementById('schedule-starttime-inp');
+        let schedule_endtime_inp = document.getElementById('schedule-endtime-inp');
+        let maxchars = document.getElementById('max-chars');
+
+        schedule_title_inp.value = "";
+        schedule_desc_inp.value = "";
+        schedule_starttime_inp.value = "";
+        schedule_endtime_inp.value = "";
+        maxchars.innerHTML = "";
+
+        let modal = document.getElementById('new-schedule-modal');
+        
+        modal.setAttribute('toggle', (modal.getAttribute('toggle') == 'off') ? 'on' : 'off');
+
+    }
+
     let updateCalendarList = () => {
         
         let calendar_list = document.getElementById('calendar-list');
@@ -42,6 +63,7 @@ let _states = {
             if(status === 'success'){
 
                 calendar_list.innerHTML = "";
+                _states.user_calendars = response.data['calendars'];
                 _states.user_calendars = response.data['calendars'];
                 response.data['calendars'].forEach(e => {
 
@@ -53,7 +75,6 @@ let _states = {
                     calendarItem.onclick = () => {
                         calendar_list.childNodes[_states.current_calendar.idx].setAttribute('selected', false);
                         selectCalendar(calendarItem);
-                        calendarItem.setAttribute('selected', 'true');
                         _states.updateDisplayDate()
                     }
 
@@ -71,6 +92,7 @@ let _states = {
         _states.current_calendar.id = parseInt(calendarItem.getAttribute('calendar-idx'));
         _states.current_calendar.idx = calendarItem.getAttribute('calendar-idx');
         _states.current_calendar.name = calendarItem.innerHTML;
+        calendarItem.setAttribute('selected', 'true');
     }
 
     //add new schedule
@@ -118,6 +140,7 @@ let _states = {
 
     new_schedule_button.onclick = () => {
         toggleNewScheduleModal();
+        _states.updateDisplayDate();
     }
 
     let new_schedule_exit = document.getElementById('new-schedule-exit');
@@ -138,12 +161,16 @@ let _states = {
         let maxchars = document.getElementById('max-chars');
         let model_color_slider = document.getElementById('modal-color-slider');
 
+        let date = `${_states.current_date.year}-${_states.current_date.month+1}-${_states.current_date.day}`;
+        let time = new Date().toTimeString().split(' ')[0];
+
         $.post("/add-schedule", {
             'schedule_title' : schedule_title_inp.value,
             'schedule_description' : schedule_desc_inp.value,
             'schedule_start' : schedule_starttime_inp.value,
             'schedule_end' : schedule_endtime_inp.value,
             'schedule_type' : 0,
+            'schedule_date' : date + " " + time,
             'color_hue' : model_color_slider.value,
             'calendar_id' : _states.user_calendars[_states.current_calendar.id]['id']
         }, (data, status) => {

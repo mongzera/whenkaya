@@ -65,9 +65,11 @@ class UserController extends BaseController{
         $schedule_description = cleanRequest($_POST['schedule_description']);
         $schedule_start =  cleanRequest($_POST['schedule_start']);
         $schedule_end =  cleanRequest($_POST['schedule_end']);
+        $schedule_date = cleanRequest($_POST['schedule_date']);
         $schedule_type =  cleanRequest($_POST['schedule_type']);
         $color_hue =  cleanRequest($_POST['color_hue']);
         $calendar_id = cleanRequest($_POST['calendar_id']);
+        
         
     
         //if any one of these is null
@@ -76,6 +78,7 @@ class UserController extends BaseController{
         !$schedule_description ||
         !$schedule_start ||
         !$schedule_end ||
+        !$schedule_date ||
         !$schedule_type ||
         !$color_hue || 
         !$calendar_id) echo 'failed';
@@ -87,6 +90,7 @@ class UserController extends BaseController{
             'schedule_description' => $schedule_description,
             'schedule_start' => $schedule_start,
             'schedule_end' => $schedule_end,
+            'schedule_date' => $schedule_date,
             'schedule_type' => $schedule_type,
             'color_hue' => $color_hue,
             'calendar_id' => $calendar_id

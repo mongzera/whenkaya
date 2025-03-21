@@ -29,6 +29,7 @@ class PublicController extends BaseController{
         $scheduleModel = new ScheduleModel();
         $scheduleModel->migrate();
 
+
         //var_dump($userCalendarAssoc->getAllFromRelatedModel('tb_calendar_model', 'calendar_id', 'user_id', Auth::getUserId()));
     }
 
