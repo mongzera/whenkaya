@@ -29,6 +29,27 @@
         return cardHTML;
     }
 
+    let noteFactory = (title, desc, idx) => {
+        title = title.trim();
+        desc = desc.trim();
+        console.log(title);
+        console.log(desc);
+        let noteHTML = 
+        `
+                    <div class="note flex flex-row align-center" id='calendar-note-${idx}'>
+                        <div class='handle'>
+                            <svg fill="#555555" width="48px" height="48px" viewBox="-87.04 -87.04 430.08 430.08" id="Flat" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="15.872"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="2.56"></g><g id="SVGRepo_iconCarrier"> <path d="M100,60.0001a8,8,0,1,1-8-8A8.00008,8.00008,0,0,1,100,60.0001Zm64,8a8,8,0,1,0-8-8A8.00008,8.00008,0,0,0,164,68.0001Zm-72,52a8,8,0,1,0,8,8A7.99977,7.99977,0,0,0,92,120.0001Zm72,0a8,8,0,1,0,8,8A7.99977,7.99977,0,0,0,164,120.0001Zm-72,68a8,8,0,1,0,8,8A7.99977,7.99977,0,0,0,92,188.0001Zm72,0a8,8,0,1,0,8,8A7.99977,7.99977,0,0,0,164,188.0001Z"></path> </g></svg>
+                            </div>
+                        <div class="info flex flex-col">
+                            <div class="note-title "><p class='p-title text-left'>${title}</p></div>
+                            <div class="note-desc"><p class='text-left'>${desc}</p></div>
+                        </div>
+                    </div>
+        `;
+
+        return noteHTML;
+    }
+
     let cldnrCtn = document.getElementById('calendar-container');
     let canvas = document.createElement('canvas');
     canvas.setAttribute("width", "400px");
@@ -83,12 +104,12 @@
 
             this.prevMonthBtn.onclick = () => {
                 this.prevMonth();
-                updateDisplayDate();
+                _states.updateAll();
             }
 
             this.nextMonthBtn.onclick = () => {
                 this.nextMonth();
-                updateDisplayDate();
+                _states.updateAll();
             }
 
             this.setTargetDate(new Date());
@@ -306,10 +327,19 @@
 
     let calendarState = new CalendarState();
 
-    let extractCardDate = (card) => {
-        return card['schedule_date'].split(' ')[0].split('-');
+    let extractDate = (colname, card) => {
+        return card[colname].split(' ')[0].split('-');
     }
 
+    let extractNoteDate = (note) => {
+        return extractDate('note_date', note);
+    }
+
+    let extractCardDate = (card) => {
+        return extractDate('schedule_date', card);
+    }
+
+    //this is responsible for fetching and updating of schedules contained in the calendar
     let updateCurrentDateCards = (currentDate) => {
         let cardsContainer = document.getElementById('cards_container');
         //clear
@@ -387,6 +417,83 @@
         // }
     }
 
+    let updateCurrentNoteCards = (currentDate) => {
+        let notesContainer = document.getElementById('notes-container');
+        
+        if(_states.user_calendars === undefined || _states.user_calendars.length == 0) return;
+
+        let checkDate = (currentDate, card) => {
+            
+            let date_arr = extractNoteDate(card);
+            let year = parseInt(date_arr[0]);
+            let month = parseInt(date_arr[1]) - 1; //Javascript Date-Month is based 0 [0] = "January"
+            let day = parseInt(date_arr[2]);
+
+            return currentDate.year == year && currentDate.month == month && currentDate.day == day; 
+        }
+
+        let _statesUpdateUserNote = (note) => {
+            let note_date = extractNoteDate(note);
+            let year = parseInt(note_date[0]);
+            let month = parseInt(note_date[1]) - 1; //Javascript Date-Month is based 0 [0] = "January"
+            let day = parseInt(note_date[2]);
+
+            let id = note['calendar_id'];
+
+            if(typeof _states.user_notes == 'undefined'){
+                _states.user_notes = {};
+            }
+
+            if(typeof _states.user_notes[id] == 'undefined'){
+                _states.user_notes[id] = {};
+            }
+
+            if(typeof _states.user_notes[id][year] == 'undefined'){
+                _states.user_notes[id][year] = {};
+            }
+
+            if(typeof _states.user_notes[id][year][month] == 'undefined'){
+                _states.user_notes[id][year][month] = {};
+            }
+
+            if(typeof _states.user_notes[id][year][month][day] == 'undefined'){
+                _states.user_notes[id][year][month][day] = {};
+            }
+
+           
+            _states.user_notes[id][year][month][day][note.id] = note;
+        }
+
+        
+        $.post("/requestusernotes", {
+            'calendar_id' : _states.user_calendars[_states.current_calendar.id]['id']
+        }, (response, status) => {
+
+            if(status !== 'success') return;
+            
+            //clear
+            notesContainer.innerHTML = "";
+
+            response.data["user_notes"].forEach((element, i) => {
+                
+                _statesUpdateUserNote(element);
+                
+                if(element.calendar_id != _states.user_calendars[_states.current_calendar.id].id) return; //check date
+                
+                if(!checkDate(_states.current_date, element)) return;
+                
+                notesContainer.innerHTML += noteFactory(element['note_title'], element['note_description'], i);
+                
+            });
+        });
+
+        
+        // for(let i = 0; i < 5; i++){
+        //     cardsContainer.innerHTML += cardFactory("4:10 AM", "11:00 PM", "TEST TITLE", "TEST DESCRIPTION");
+        // }
+    }
+
+    
     let updateDisplayDate = () => {
         let dashboard_date_display = document.getElementById('current_date');
         let dashboard_daily_sched_title = document.getElementById('daily-scheduler-title');
@@ -411,6 +518,7 @@
         if(_states.user_calendars !== undefined && _states.user_calendars.length > 0) showSchedulesView();
         
         updateCurrentDateCards(_states.current_date);
+        updateCurrentNoteCards(_states.current_date);
     }
 
     let showAll = () => {
@@ -434,7 +542,11 @@
 
         _states.updateDisplayDate = updateDisplayDate;
 
-        _states.updateDisplayDate();
+        _states.updateAll = () => {
+            _states.updateDisplayDate();
+        }
+
+        _states.updateAll();
 
         
         showAll();
@@ -455,7 +567,7 @@
         canvas.addEventListener("mousedown", (evt) => {
             console.log("pressed");
             calendarState.setTargetDate(calendarState._hoverData.dateInfo);
-            _states.updateDisplayDate();
+            _states.updateAll();
         });
 
         //set calendarState.setTargetDate

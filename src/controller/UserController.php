@@ -5,6 +5,7 @@ namespace Src\Controller;
 use Src\Middleware\Auth;
 use Src\Model\CalendarModel;
 use Src\Model\CalendarUserModel;
+use Src\Model\NoteModel;
 use Src\Model\ScheduleModel;
 
 class UserController extends BaseController{
@@ -28,10 +29,6 @@ class UserController extends BaseController{
     }
 
     public function addCalendar(){
-        // if(!Auth::user()) {
-        //     echo 'failed';
-        //     exit();
-        // }
         
         if(!isPost()) return;
         echo 'success';
@@ -108,6 +105,14 @@ class UserController extends BaseController{
     }
     
     public function fetchUserCalendars(){
+        if(!isPost()){
+            exit();
+        }
+
+        if(!Auth::user()){
+            exit();
+        }
+
         header('Content-Type: application/json');
 
         $userCalendarAssoc = new CalendarUserModel();
@@ -121,9 +126,8 @@ class UserController extends BaseController{
         );
 
         $out = json_encode($response);
-
-
         echo $out;
+
         exit();
     }
 
@@ -156,6 +160,59 @@ class UserController extends BaseController{
             'data' => [
                 'user_schedules' => $scheduleModel->getAllWithColumn('calendar_id', $calendar_id),
                 'help' => 'test'
+            ]
+        );
+
+        echo json_encode($response);
+        exit();
+    }
+
+    public function addNote(){
+        if(!isPost()) exit();
+
+        $noteTitle = $_POST['note_title'];
+        $noteDesc = $_POST['note_description'];
+        $noteDate = $_POST['note_date'];
+        $color_hue = $_POST['color_hue'];
+        $calendar_id = $_POST['calendar_id'];
+
+        $noteModel = new NoteModel();
+
+        $noteModel->insert([
+            'note_title' => $noteTitle,
+            'note_description' => $noteDesc,
+            'note_date' => $noteDate,
+            'color_hue' => $color_hue,
+            'calendar_id' => $calendar_id
+        ]);
+    }
+
+    public function requestUserNotes(){
+        if(!isPost()) return;
+
+        $calendar_id = cleanRequest($_POST['calendar_id']);
+
+        $calendarUserAssoc = new CalendarUserModel();
+        $canView = false;
+        $results = $calendarUserAssoc->getAllWithColumn('user_id', Auth::getUserId());
+
+        foreach($results as $row){
+            if($row['calendar_id'] == $calendar_id){
+                $canView = ($row['privilage_level'] <= 1);
+                break;
+            }
+        }
+
+        if(!$canView) exit();
+
+        $noteModel = new NoteModel();
+
+        header('Content-Type: application/json');
+        $response = array(
+            'status' => 'success',
+            'message' => 'Data fetched successfully',
+            'data' => [
+                'user_notes' => $noteModel->getAllWithColumn('calendar_id', $calendar_id)
             ]
         );
 

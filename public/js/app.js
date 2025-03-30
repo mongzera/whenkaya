@@ -31,6 +31,24 @@ let _states = {
         
         modal.setAttribute('toggle', (modal.getAttribute('toggle') == 'off') ? 'on' : 'off');
 
+        _states.updateAll();
+    }
+
+    let toggleNewNotesModal = () => {
+        
+        //clear all input
+        let notes_title_inp = document.getElementById('notes-title-inp');
+        let notes_desc_inp = document.getElementById('notes-desc-inp');
+
+        notes_title_inp.value = "";
+        notes_desc_inp.value = "";
+
+
+        let modal = document.getElementById('new-notes-modal');
+        
+        modal.setAttribute('toggle', (modal.getAttribute('toggle') == 'off') ? 'on' : 'off');
+
+        _states.updateAll();
     }
 
 
@@ -56,7 +74,7 @@ let _states = {
                     calendarItem.onclick = () => {
                         calendar_list.childNodes[_states.current_calendar.idx].setAttribute('selected', false);
                         selectCalendar(calendarItem);
-                        _states.updateDisplayDate()
+                        _states.updateAll();
                     }
 
                     calendarItem.innerHTML = e['calendar_name'];
@@ -117,19 +135,15 @@ let _states = {
 
     updateCalendarList();
 
+    /////////////////////////////
     let new_schedule_button = document.getElementById('add-new-schedule');
 
-    new_schedule_button.onclick = () => {
-        toggleNewScheduleModal();
-        _states.updateDisplayDate();
-    }
+    new_schedule_button.onclick = () => toggleNewScheduleModal();
+        
 
     let new_schedule_exit = document.getElementById('new-schedule-exit');
-    new_schedule_exit.onclick = () => {
-        toggleNewScheduleModal();
-        _states.updateDisplayDate();
-    }
-
+    new_schedule_exit.onclick = () => toggleNewScheduleModal();
+        
 
     let new_schedule_submit = document.getElementById('create-schedule');
     new_schedule_submit.onclick = () => {
@@ -160,8 +174,43 @@ let _states = {
         });
 
         toggleNewScheduleModal();
-        _states.updateDisplayDate();
     }
+
+
+    let new_notes_button = document.getElementById('add-new-note');
+    new_notes_button.onclick = () => toggleNewNotesModal();
+        
+    
+
+    let new_notes_exit = document.getElementById('new-notes-exit');
+    new_notes_exit.onclick = () => toggleNewNotesModal();
+        
+
+    let new_notes_submit = document.getElementById('create-note');
+    new_notes_submit.onclick = () => {
+        console.log("CLOCKED");
+        //clear all input
+        let notes_title_inp = document.getElementById('notes-title-inp');
+        let notes_desc_inp = document.getElementById('notes-desc-inp');
+        let modal = document.getElementById('new-notes-modal');
+
+        let date = `${_states.current_date.year}-${_states.current_date.month+1}-${_states.current_date.day}`;
+        let time = new Date().toTimeString().split(' ')[0]; 
+
+        $.post("/add-note", {
+            'note_title' : notes_title_inp.value,
+            'note_description' : notes_desc_inp.value,
+            'note_date' : date + " " + time,
+            'color_hue' : model_color_slider.value,
+            'calendar_id' : _states.user_calendars[_states.current_calendar.id]['id']
+        }, (data, status) => {
+            console.log("NOTE UPLOAD STATUS: " + status);
+            console.log("DATA: " + data);
+        });
+
+        toggleNewNotesModal();
+    }
+
 
     let model_color_slider = document.getElementById('modal-color-slider');
     model_color_slider.addEventListener('input', ()=>{

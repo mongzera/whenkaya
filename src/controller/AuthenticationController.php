@@ -17,10 +17,10 @@ class AuthenticationController extends BaseController{
 
 
             $firstname = cleanRequest($_POST['firstname']);
-            $lastname = cleanRequest($_POST['lastname']);
-            $username = cleanRequest($_POST['username']);
-            $password = cleanRequest($_POST['password']);
-            $email = cleanRequest($_POST['email']);
+            $lastname  = cleanRequest($_POST['lastname'] );
+            $username  = cleanRequest($_POST['username'] );
+            $password  = cleanRequest($_POST['password'] );
+            $email     = cleanRequest($_POST['email']    );
             $retype_password = cleanRequest($_POST['retype-password']);
 
             
