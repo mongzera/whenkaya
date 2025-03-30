@@ -13,11 +13,16 @@ function create_get_routes($router){
      $router->map("GET", "/dashboard", "UserController::dashboard", "dashboard");
     // $router->map("GET", "/create-account", 'AuthController::create_account', 'create_account');
      $router->map("GET", "/logout", "AuthenticationController::logout", "logout");
+     $router->map("GET", "/migrate", "PublicController::migrate", 'migrate');
 }
 
 function create_post_routes($router){
-    $router->map("POST", "/addschedule", 'UserController::addSchedule', 'addScheduleUser');
-    $router->map("POST", "/fetchuserschedule", 'UserController::fetchUserSchedules', 'fetchScheduleUser');
+    $router->map("POST", "/addcalendar", 'UserController::addCalendar', 'addCalendarUser');
+    $router->map("POST", "/add-schedule", 'UserController::addSchedule', 'addScheduleUser');
+    $router->map("POST", "/add-note", "UserController::addNote", "addNoteUser");
+    $router->map("POST", "/requestuserschedules", "UserController::requestUserSchedules", "requestUserSchedules");
+    $router->map("POST", "/requestusernotes", "UserController::requestUserNotes", "requestUserNotes");
+    $router->map("POST", "/fetchusercalendars", 'UserController::fetchUserCalendars', 'fetchusercalendars');
     $router->map("POST", "/create-account", "AuthenticationController::create_account", "create_account_post");
     $router->map("POST", "/login", "AuthenticationController::login_account", 'login_account_post');
 }
