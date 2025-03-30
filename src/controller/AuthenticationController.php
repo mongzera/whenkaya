@@ -11,9 +11,10 @@ class AuthenticationController extends BaseController{
     public function create_account(){
         if(Auth::user()) redirect("dashboard");
 
+
+        $error = "";
         //create new user logic
         if(isPost()){
-
 
             $firstname = cleanRequest($_POST['firstname']);
             $lastname = cleanRequest($_POST['lastname']);
@@ -22,9 +23,8 @@ class AuthenticationController extends BaseController{
             $email = cleanRequest($_POST['email']);
             $retype_password = cleanRequest($_POST['retype-password']);
 
-            
             $isAllInputValid = true;
-            $error = "";
+          
 
             $hashed = password_hash($password, PASSWORD_DEFAULT);
 
@@ -43,6 +43,21 @@ class AuthenticationController extends BaseController{
                 $isAllInputValid = false;
             }
 
+            if($username == ''){
+                $error =  "<p style='color: red;'>Username name cannot be blank!</p>";
+                $isAllInputValid = false;
+            }
+
+            if($password == ''){
+                $error =  "<p style='color: red;'>Password cannot be blank!</p>";
+                $isAllInputValid = false;
+            }
+
+            if($email == ''){
+                $error =  "<p style='color: red;'>Username name cannot be blank!</p>";
+                $isAllInputValid = false;
+            }
+
             if($isAllInputValid){
                 $user = new UserModel();
 
@@ -58,18 +73,17 @@ class AuthenticationController extends BaseController{
                 }
             }
             
-            // if(db_create_user($username, $hashed)){
-            //     Auth::authenticate_user($username, $password);
-            //     redirect("dashboard");
-            
-            // }
+             //if(db_create_user($username, $hashed)){
+               //  Auth::authenticate_user($username, $password);
+               //redirect("dashboard");
+            //}
         }
-
+        
         $content = [
             "title" => "Create Account",
             "head" => "../src/views/default_head.php",
             "body" => "../src/views/auth/create-account.view.php",
-            "error" => $error
+            "error" => $error,
         ];
 
         $static = [
@@ -83,20 +97,42 @@ class AuthenticationController extends BaseController{
     public function login_account(){
         if(Auth::user()) redirect("dashboard");
 
+        $error = "";
+
         //login user logic
         if(isPost()){
             $username = cleanRequest($_POST['username']);
             $password = cleanRequest($_POST['password']);
-
+            
             if(Auth::authenticate_user($username, $password)){
                 redirect("dashboard");
+
+            }else{
+                $error = "<p style='color: red;'>Account does not exist!</p>";
             }
+
+            if (empty($username) && empty($password)) {
+                $error = "<p style='color: red;'>Please input the necessary information, the boxes cannot be blank!</p>";
+                $isAllInputValid = false;
+            }
+
+            if($username == ''){
+                $error =  "<p style='color: red;'>Username name cannot be blank!</p>";
+                $isAllInputValid = false;
+            }
+            
+            if($password == ''){
+                $error =  "<p style='color: red;'>Password name cannot be blank!</p>";
+                $isAllInputValid = false;
+            }
+
         }
 
         $content = [
             "title" => "Login Account",
             "head" => "../src/views/default_head.php",
-            "body" => "../src/views/auth/login.view.php"
+            "body" => "../src/views/auth/login.view.php",
+            "error" => $error
         ];
 
         $static = [

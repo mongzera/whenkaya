@@ -25,9 +25,7 @@ class Auth{
 
         $row = $user->getColumn('username', $username);
 
-        var_dump($row);
-
-        if($row == null) return false;
+        if($row == false) return false;
 
         $hashed_password = $row['password_hashed'];
 

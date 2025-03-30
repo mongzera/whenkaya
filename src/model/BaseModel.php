@@ -19,7 +19,7 @@ abstract class BaseModel{
     private $result_set;
 
     public function getId(int $id) : array{
-        return $this->getColumn('id', $id);
+        return $this->getColumn('id', $id)['id'];
     }
 
     public function getColumn($columnname, $value){
@@ -30,9 +30,16 @@ abstract class BaseModel{
         $stmt = $conn->prepare($query);
         $stmt->execute();
 
-        
+    
+        $result_set = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $this->row = $stmt->fetchAll()[0];
+        if(empty($result_set)){
+            return false;
+        }
+
+        $this->row = $result_set[0];
+
+
         return $this->row;
     }
 

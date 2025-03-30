@@ -15,6 +15,6 @@
     <?php 
     echo "<br>";
     echo $content['error'];
-    
+    echo "<br/>"
     ?>
 </div>
