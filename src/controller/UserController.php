@@ -170,11 +170,11 @@ class UserController extends BaseController{
     public function addNote(){
         if(!isPost()) exit();
 
-        $noteTitle = $_POST['note_title'];
-        $noteDesc = $_POST['note_description'];
-        $noteDate = $_POST['note_date'];
-        $color_hue = $_POST['color_hue'];
-        $calendar_id = $_POST['calendar_id'];
+        $noteTitle = cleanRequest($_POST['note_title']);
+        $noteDesc = cleanRequest($_POST['note_description']);
+        $noteDate = cleanRequest($_POST['note_date']);
+        $color_hue = cleanRequest($_POST['color_hue']);
+        $calendar_id = cleanRequest($_POST['calendar_id']);
 
         $noteModel = new NoteModel();
 

@@ -69,7 +69,7 @@ use Src\Middleware\Auth;
         </div>
 
         <div class="mainview flex flex-row">
-            <div class="left-section border-right">
+            <div class="calendar-note-section border-right">
                 <div class="calendar container-padding">
                     <h3>Calendar</h3>
                     <div class="calendar-view flex flex-col align-center justify-center">

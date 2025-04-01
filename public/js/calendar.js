@@ -37,12 +37,12 @@
         let noteHTML = 
         `
                     <div class="note flex flex-row align-center" id='calendar-note-${idx}'>
-                        <div class='handle'>
+                        <div class='handle flex align-center'>
                             <svg fill="#555555" width="48px" height="48px" viewBox="-87.04 -87.04 430.08 430.08" id="Flat" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="15.872"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="2.56"></g><g id="SVGRepo_iconCarrier"> <path d="M100,60.0001a8,8,0,1,1-8-8A8.00008,8.00008,0,0,1,100,60.0001Zm64,8a8,8,0,1,0-8-8A8.00008,8.00008,0,0,0,164,68.0001Zm-72,52a8,8,0,1,0,8,8A7.99977,7.99977,0,0,0,92,120.0001Zm72,0a8,8,0,1,0,8,8A7.99977,7.99977,0,0,0,164,120.0001Zm-72,68a8,8,0,1,0,8,8A7.99977,7.99977,0,0,0,92,188.0001Zm72,0a8,8,0,1,0,8,8A7.99977,7.99977,0,0,0,164,188.0001Z"></path> </g></svg>
                             </div>
                         <div class="info flex flex-col">
-                            <div class="note-title "><p class='p-title text-left'>${title}</p></div>
-                            <div class="note-desc"><p class='text-left'>${desc}</p></div>
+                            <div class="note-title flex align-end"><p class='p-title text-left'>${title}</p></div>
+                            <div class="note-desc flex align-start"><p class='text-left'>${desc}</p></div>
                         </div>
                     </div>
         `;
@@ -418,7 +418,11 @@
     }
 
     let updateCurrentNoteCards = (currentDate) => {
+
+        
         let notesContainer = document.getElementById('notes-container');
+        //clear
+        notesContainer.innerHTML = "";
         
         if(_states.user_calendars === undefined || _states.user_calendars.length == 0) return;
 
@@ -471,17 +475,12 @@
 
             if(status !== 'success') return;
             
-            //clear
-            notesContainer.innerHTML = "";
-
             response.data["user_notes"].forEach((element, i) => {
                 
-                _statesUpdateUserNote(element);
-                
                 if(element.calendar_id != _states.user_calendars[_states.current_calendar.id].id) return; //check date
-                
                 if(!checkDate(_states.current_date, element)) return;
-                
+
+                _statesUpdateUserNote(element);
                 notesContainer.innerHTML += noteFactory(element['note_title'], element['note_description'], i);
                 
             });

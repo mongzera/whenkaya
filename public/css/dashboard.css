@@ -4,6 +4,8 @@
 
 #schedules-view{
     display: none;
+    min-width: 520px !important;
+    max-width: 520px !important;
 }
 
 .sidebar{
@@ -13,6 +15,11 @@
 
 .profile{
     height: 100px;
+}
+
+.calendar-note-section{
+    min-width: 570px !important;
+    max-width: 570px !important;
 }
 
 .calendar{
@@ -256,11 +263,43 @@
 
 .note{
     height: 100px;
-    width: 85%;
+    min-width: 490px !important;
+    max-width: 490px !important;
     background-color: #FFF;
     padding: 0px 50px 0px 0px;
     border: 0.5px solid var(--dark-hl);
     border-radius: 15px;
     margin: 15px;
     box-shadow: 1px 1px 5px 5px rgba(0, 0, 0, 0.05);
+}
+
+.note .info{
+    height: 100%;
+    padding: 15px;
+}
+
+.note .handle{
+    height: 100%;
+    border-right: 0.5px solid var(--dark-hl);
+    margin-right: 15px;
+}
+
+.note-title{
+    height: 50%;
+    max-width: 490px;
+    overflow: hidden;
+}
+
+.note-desc{
+    height: 50%;
+    max-width: 490px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.note-desc p{
+    overflow: hidden;
+    
+    word-wrap: break-word;
+    
 }
