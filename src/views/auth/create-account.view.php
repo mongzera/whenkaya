@@ -9,12 +9,7 @@
             <input type="password" name="password" id="password" class="auth-input-field" placeholder="Password"/>
             <input type="password" name="retype-password" id="retype-password" class="auth-input-field" placeholder="Retype-Password"/>
             <input type="submit" value="Create Account" class="auth-input-field auth-submit" />
+            <p>Already have an account? <a href="/login">Login here</a></p>
         </div>
     </form>
-
-    <?php 
-    echo "<br>";
-    echo $content['error'];
-    
-    ?>
 </div>
