@@ -6,79 +6,96 @@ use Src\Db\Database;
 use Src\Middleware\Auth;
 use Src\Model\UserModel;
 
-class AuthenticationController extends BaseController{
-
-    public function create_account(){
-        if(Auth::user()) redirect("dashboard");
-
+class AuthenticationController extends BaseController
+{
+    public function create_account()
+    {
+        if (Auth::user()) redirect("dashboard");
 
         $error = "";
-        //create new user logic
-        if(isPost()){
+        $errorMessages = [];
 
+        if (isPost()) {
             $firstname = cleanRequest($_POST['firstname']);
             $lastname = cleanRequest($_POST['lastname']);
             $username = cleanRequest($_POST['username']);
             $password = cleanRequest($_POST['password']);
-            $email = cleanRequest($_POST['email']);
             $retype_password = cleanRequest($_POST['retype-password']);
+            $email = cleanRequest($_POST['email']);
 
             $isAllInputValid = true;
-          
 
-            $hashed = password_hash($password, PASSWORD_DEFAULT);
+            // Check required fields
+            if (empty($firstname)) {
+                $errorMessages[] = "First name cannot be blank!";
+                $isAllInputValid = false;
+            } elseif (!preg_match('/^[a-zA-Z]+$/', $firstname)) {
+                $errorMessages[] = "First name must only contain letters!";
+                $isAllInputValid = false;
+            }
+            
+            if (empty($lastname)) {
+                $errorMessages[] = "Last name cannot be blank!";
+                $isAllInputValid = false;
+            } elseif (!preg_match('/^[a-zA-Z]+$/', $lastname)) {
+                $errorMessages[] = "Last name must only contain letters!";
+                $isAllInputValid = false;
+            }
+            
 
-            if(!($password === $retype_password)) {
-                $error =  "<p style='color: red;'>Password mismatch!</p>";
+            if (empty($username)) {
+                $errorMessages[] = "Username cannot be blank!";
+                $isAllInputValid = false;
+            } elseif (!preg_match('/^[a-zA-Z0-9._-]{3,30}$/', $username)) {
+                $errorMessages[] = "Username must be 3–30 characters and use letters, numbers, dots, underscores, or hyphens.";
                 $isAllInputValid = false;
             }
 
-            if($firstname == ''){
-                $error =  "<p style='color: red;'>First name cannot be blank!</p>";
+            if (empty($email)) {
+                $errorMessages[] = "Email cannot be blank!";
+                $isAllInputValid = false;
+            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errorMessages[] = "Invalid email format!";
                 $isAllInputValid = false;
             }
 
-            if($lastname == ''){
-                $error =  "<p style='color: red;'>Last Name cannot be blank!</p>";
+            if (empty($password)) {
+                $errorMessages[] = "Password cannot be blank!";
+                $isAllInputValid = false;
+            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/', $password)) {
+                $errorMessages[] = "Password must be at least 8 characters and include uppercase, lowercase, number, and special character.";
                 $isAllInputValid = false;
             }
 
-            if($username == ''){
-                $error =  "<p style='color: red;'>Username name cannot be blank!</p>";
+            if ($password !== $retype_password) {
+                $errorMessages[] = "Password mismatch!";
                 $isAllInputValid = false;
             }
 
-            if($password == ''){
-                $error =  "<p style='color: red;'>Password cannot be blank!</p>";
-                $isAllInputValid = false;
-            }
+            // Convert array of errors to one HTML string
+            $error = join("<br>", array_map(fn($msg) => "<p style='color:red;'>$msg</p>", $errorMessages));
 
-            if($email == ''){
-                $error =  "<p style='color: red;'>Username name cannot be blank!</p>";
-                $isAllInputValid = false;
-            }
+            // If all good, insert user
+            if ($isAllInputValid) {
+                $hashed = password_hash($password, PASSWORD_DEFAULT);
 
-            if($isAllInputValid){
                 $user = new UserModel();
 
-                if($user->insert([
+                if ($user->insert([
                     'first_name' => $firstname,
                     'last_name' => $lastname,
                     'username' => $username,
                     'email' => $email,
                     'password_hashed' => $hashed
-                ])){
+                ])) {
                     Auth::authenticate_user($username, $password);
                     redirect("dashboard");
+                } else {
+                    $error = "<p style='color:red;'>Account creation failed. Please try again.</p>";
                 }
             }
-            
-             //if(db_create_user($username, $hashed)){
-               //  Auth::authenticate_user($username, $password);
-               //redirect("dashboard");
-            //}
         }
-        
+
         $content = [
             "title" => "Create Account",
             "head" => "../src/views/default_head.php",
@@ -94,38 +111,37 @@ class AuthenticationController extends BaseController{
         render_page($content, $static);
     }
 
-    public function login_account(){
-        if(Auth::user()) redirect("dashboard");
+    public function login_account()
+    {
+        if (Auth::user()) redirect("dashboard");
 
         $error = "";
+        $errorMessages = [];
 
-        //login user logic
-        if(isPost()){
+        if (isPost()) {
             $username = cleanRequest($_POST['username']);
             $password = cleanRequest($_POST['password']);
-            
-            if(Auth::authenticate_user($username, $password)){
-                redirect("dashboard");
+            $isAllInputValid = true;
 
-            }else{
-                $error = "<p style='color: red;'>Account does not exist!</p>";
-            }
-
-            if (empty($username) && empty($password)) {
-                $error = "<p style='color: red;'>Please input the necessary information, the boxes cannot be blank!</p>";
+            if (empty($username)) {
+                $errorMessages[] = "Username cannot be blank!";
                 $isAllInputValid = false;
             }
 
-            if($username == ''){
-                $error =  "<p style='color: red;'>Username name cannot be blank!</p>";
-                $isAllInputValid = false;
-            }
-            
-            if($password == ''){
-                $error =  "<p style='color: red;'>Password name cannot be blank!</p>";
+            if (empty($password)) {
+                $errorMessages[] = "Password cannot be blank!";
                 $isAllInputValid = false;
             }
 
+            if ($isAllInputValid) {
+                if (Auth::authenticate_user($username, $password)) {
+                    redirect("dashboard");
+                } else {
+                    $errorMessages[] = "Invalid username or password!";
+                }
+            }
+
+            $error = join("<br>", array_map(fn($msg) => "<p style='color:red;'>$msg</p>", $errorMessages));
         }
 
         $content = [
@@ -143,7 +159,8 @@ class AuthenticationController extends BaseController{
         render_page($content, $static);
     }
 
-    public function logout(){
+    public function logout()
+    {
         Auth::logout();
         redirect("login_account_get");
     }
