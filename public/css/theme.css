@@ -14,9 +14,16 @@
     --white: #FFF;
 }
 
+
+
 .no-decor{
     text-decoration: none;
     color: #000;
+    
+}
+
+.no-decor:hover{
+    
 }
 
 .container{

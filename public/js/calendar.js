@@ -50,6 +50,10 @@
         return noteHTML;
     }
 
+    ///coloooors///
+
+    let dark_blue = "#426d96";
+
     let cldnrCtn = document.getElementById('calendar-container');
     let canvas = document.createElement('canvas');
     canvas.setAttribute("width", "400px");
@@ -212,6 +216,14 @@
 
         }   
 
+        isSameDay = (date1, date2) => {
+            return (
+              date1.getFullYear() === date2.getFullYear() &&
+              date1.getMonth() === date2.getMonth() && // Note: 0-indexed (0 = Jan)
+              date1.getDate() === date2.getDate()
+            );
+        }
+
         draw = () => {
             //console.log('update');]
             ctx.imageSmoothingEnabled = false;
@@ -238,7 +250,7 @@
             ctx.font = "700 16px Inter"; //make it thiccc
             for(let i = 0; i < this.days.length; i++){
                 ctx.fillStyle="#000";
-                if(i == 0) ctx.fillStyle = "#FF0000";
+                if(i == 0) ctx.fillStyle = dark_blue;
                 ctx.fillText(this.days[i], i * daySpacing + daySpacing*0.5 - 8, 30);
             }
 
@@ -264,8 +276,19 @@
                 let schedExists = typeof _states.user_schedules?.[_states.user_calendars?.[_states.current_calendar?.id]?.id]?.[_states.current_date?.year]?.[_states.current_date?.month]?.[day.getDate()] !== 'undefined';
 
                 //console.log(schedExists);
+
+                let isToday = this.isSameDay(day, new Date());
+                if(isToday){
+                    
+                    ctx.fillStyle = dark_blue;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.roundRect(midX - outlinePad, midY - outlinePad, 2 * outlinePad, 2 * outlinePad, 5);
+                    ctx.fill();
+                }
                 
-                ctx.fillStyle = "#000";
+                
+                ctx.fillStyle = (isToday ? "#fff" : "#000");
                 let isDayWitinTargetMonth = true;
                 if(dayOffset + i < 1 || dayOffset + i > monthDays) {
                     ctx.fillStyle = "#B8B8B8";
@@ -291,7 +314,6 @@
                 //this.drawCardCircleColor(midX, midY, outlinePad, 234);
 
                 
-
                 
 
                 if( this.isDayBeingHovered(midX - outlinePad, midY - outlinePad, 2 * outlinePad, 2 * outlinePad) ){
@@ -313,12 +335,16 @@
                         
                     }
 
-                    ctx.strokeStyle = "#FF0000";
+                    ctx.strokeStyle = dark_blue;
                     ctx.lineWidth = 2;
                     ctx.beginPath();
                     ctx.roundRect(midX - outlinePad, midY - outlinePad, 2 * outlinePad, 2 * outlinePad, 5);
                     ctx.stroke();
                 }
+
+                //if day is today
+                
+                
             }
             
         }
