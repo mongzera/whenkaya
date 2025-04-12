@@ -152,7 +152,7 @@
             this._targetDate.year = dateObject.getFullYear();
             this._targetDate.dateObject = dateObject;
 
-            console.log(this._targetDate);
+            //console.log(this._targetDate);
 
             //this._hoverData.listenToHover = false;
 
@@ -194,7 +194,7 @@
             if(!this.shouldAnimateHoverBorder) return;
 
             //animate date hovering
-            let lerpFactor = 0.10;
+            let lerpFactor = 0.1;
 
             this._hoverData.oldX += (this._hoverData.currentX - this._hoverData.oldX) * lerpFactor;
             this._hoverData.oldY += (this._hoverData.currentY - this._hoverData.oldY) * lerpFactor;
@@ -276,7 +276,7 @@
                 let schedExists = typeof _states.user_schedules?.[_states.user_calendars?.[_states.current_calendar?.id]?.id]?.[_states.current_date?.year]?.[_states.current_date?.month]?.[day.getDate()] !== 'undefined';
 
                 //console.log(schedExists);
-
+                //if day is today
                 let isToday = this.isSameDay(day, new Date());
                 if(isToday){
                     
@@ -286,6 +286,8 @@
                     ctx.roundRect(midX - outlinePad, midY - outlinePad, 2 * outlinePad, 2 * outlinePad, 5);
                     ctx.fill();
                 }
+
+                
                 
                 
                 ctx.fillStyle = (isToday ? "#fff" : "#000");
@@ -342,7 +344,7 @@
                     ctx.stroke();
                 }
 
-                //if day is today
+                
                 
                 
             }
