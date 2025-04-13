@@ -57,7 +57,7 @@ use Src\Middleware\Auth;
 
 <!--ends here-->
 
-<div class="container flex flex-row" id='container'>
+<div class="container flex flex-row " id='container'>
         <div class="sidebar px-1 border-right">
             <div class="profile flex align-center">
                 <h3><?php echo Auth::getUserName() ?></h3>
