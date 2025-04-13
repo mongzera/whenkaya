@@ -307,6 +307,7 @@
 .note .info{
     height: 100%;
     padding: 15px;
+    width: 100%;
 }
 
 .note .handle{

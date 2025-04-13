@@ -154,21 +154,40 @@ let _states = {
                         if(calendarItem != lastCalendarItem )lastCalendarItem.querySelector('.share-calendar-popup')?.setAttribute('hide', true);
                         calendar_list.childNodes[_states.current_calendar.idx].setAttribute('selected', false);
                         selectCalendar(calendarItem);
-                        _states.updateAll();
+                        //_states.updateAll();
                     }
 
                     calendar_list.appendChild(calendarItem);
 
-                    if(calendar_list.children.length == 1) selectCalendar(calendarItem);
+                    
                 });
+
+                if(calendar_list.children.length > 0) selectCalendar(calendar_list.children[0]);
             }
         });
     }
+
+    _states.updateCalendars = updateCalendarList;
 
     let selectCalendar = (calendarItem) => {
         _states.current_calendar.id = parseInt(calendarItem.getAttribute('calendar-idx'));
         _states.current_calendar.idx = calendarItem.getAttribute('calendar-idx');
         _states.current_calendar.name = calendarItem.getAttribute('calendar-name');
+        _states.current_calendar.canEdit = _states.user_calendars[_states.current_calendar.id].privilage_level < 2;
+
+        _states.updateAll();
+
+        let addSched = document.getElementById('add-new-schedule');
+        addSched.style.display = "block";
+
+            let addNote = document.getElementById('add-new-note');
+        addNote.style.display = "block";
+
+        if(!_states.current_calendar.canEdit){
+            addSched.style.display = "none";
+            addNote.style.display = "none";
+        }
+
         calendarItem.setAttribute('selected', 'true');
 
         let shareBtn = document.getElementById('calendar-idx-'+_states.current_calendar.idx);
@@ -189,11 +208,41 @@ let _states = {
             copyLinkBtn.setAttribute('class', 'form-submit');
             copyLinkBtn.innerText = "Copy Link";
             copyLinkBtn.onclick = (evt) => {
+                let privilage_level = document.getElementById(`privilageLvl-${_states.current_calendar.idx}`).value;
 
+                $.post('/createcalendarlink', {
+                    'calendar_id' : _states.user_calendars[_states.current_calendar.id].id,
+                    'privilage_level' : privilage_level
+                }, (data, status) => {
+                    console.log(data);
+                    console.log(status);
+
+                    navigator.clipboard.writeText(data)
+                    .then(() => {
+                        console.log('Text copied!');
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy: ', err);
+                    });
+                });
+
+                // $.post("/add-schedule", {
+                //     'schedule_title' : schedule_title_inp.value,
+                //     'schedule_description' : schedule_desc_inp.value,
+                //     'schedule_start' : schedule_starttime_inp.value,
+                //     'schedule_end' : schedule_endtime_inp.value,
+                //     'schedule_type' : 0,
+                //     'schedule_date' : date + " " + time,
+                //     'color_hue' : model_color_slider.value,
+                //     'calendar_id' : _states.user_calendars[_states.current_calendar.id]['id']
+                // }, (data, status) => {
+                //     console.log("SCHEDULE UPLOAD STATUS: " + status);
+                //     console.log("DATA: " + data);
+                // });
             }
 
             let popupInner = `
-                <div><label for='privilage_level'>Privilage Level:</label><select id='privilageLvl' name='privilage_level'>
+                <div><label for='privilage_level'>Privilage Level:</label><select id='privilageLvl-${_states.current_calendar.idx}' name='privilage_level'>
                     <option value="1">Can Edit</option>
                     <option value="2">Can View Only</option>
                 </select></div>

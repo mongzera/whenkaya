@@ -1,7 +1,7 @@
 <?php
 
 function create_routes($router){
-
+    $router->addMatchTypes(['cl', '[a-zA-Z0-9_-]+']);
     create_get_routes($router);
     create_post_routes($router);
 }
@@ -29,5 +29,5 @@ function create_post_routes($router){
     $router->map("POST", "/create-account", "AuthenticationController::create_account", "create_account_post");
     $router->map("POST", "/login", "AuthenticationController::login_account", 'login_account_post');
 
-    $router->map('POST', '/createcalendar', 'CalendarShareController::createCalendarLink', 'create_calendar_link_post');
+    $router->map('POST', '/createcalendarlink', 'CalendarShareController::createCalendarLink', 'create_calendar_link_post');
 }

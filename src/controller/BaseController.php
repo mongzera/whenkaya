@@ -8,6 +8,7 @@ include_once "../src/utilities/render.php";
 include_once "../src/utilities/redirect.php";
 include_once "../src/utilities/db.util.php";
 include_once "../src/utilities/request.util.php";
+include_once "../src/utilities/math.util.php";
 
 abstract class BaseController{
 

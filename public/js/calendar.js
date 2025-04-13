@@ -425,6 +425,7 @@
 
             console.log("REQUESTED CURRENT SCHEDULES");
 
+            cardsContainer.innerHTML = "";
             response.data["user_schedules"].forEach((element, i) => {
 
                 _statesUpdateUserSchedule(element);
@@ -502,6 +503,8 @@
         }, (response, status) => {
 
             if(status !== 'success') return;
+
+            notesContainer.innerHTML = "";
             
             response.data["user_notes"].forEach((element, i) => {
                 
@@ -541,6 +544,8 @@
         dashboard_daily_sched_title.innerHTML = "Day schedule for " +  "<b>" + _states.current_calendar.name +  "</b>";
         dashboard_date_display.innerHTML = calendarState.months[_states.current_date.month] + " " + _states.current_date.day + ", " + _states.current_date.year;
         
+        
+
         //show schedules view if there are calendars
         if(_states.user_calendars !== undefined && _states.user_calendars.length > 0) showSchedulesView();
         
@@ -560,7 +565,7 @@
 
 
     window.onload = () =>{
-        
+        _states.updateCalendars();
         
         setInterval(() => {
             calendarState.draw()
@@ -573,10 +578,12 @@
             _states.updateDisplayDate();
         }
 
-        _states.updateAll();
+       // _states.updateAll();
 
         
         showAll();
+
+        //_states.updateAll();
 
         //mousemove listener
         canvas.addEventListener("mousemove", (evt) => {

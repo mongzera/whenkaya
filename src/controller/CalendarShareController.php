@@ -22,8 +22,24 @@ class CalendarShareController extends BaseController{
 
         $calendarShareRow = $calendarShareModel->getColumn('link', $link);
 
-        //var_dump($calendarShareRow);
+        if($calendarShareRow == null) {
+            echo "Broken link. Link does not exist!";
+            exit();
+        }
 
+        $calendarId = $calendarShareRow['calendar_id'];
+
+        $calendarUserAssoc = new CalendarUserModel();
+
+        $calendarUserAssoc->insert([
+            
+            'user_id' => Auth::getUserId(),
+            'calendar_id' => $calendarId,
+            'privilage_level' => $calendarShareRow['privilage_level']
+            
+        ]);
+
+        redirect('dashboard');
     }
 
     public function createCalendarLink(){
@@ -56,7 +72,7 @@ class CalendarShareController extends BaseController{
 
         $row = [
             'user_id' => $userId,
-            'link' => 'UUID()',
+            'link' => generateUUID(),
             'calendar_id' => $calendar_id,
             'privilage_level' => $privilage_level,
             'duration' => 5
@@ -67,10 +83,9 @@ class CalendarShareController extends BaseController{
 
         $lastInsertRow = $calendarLinkShareModel->lastInsertRow;
 
-        echo 'http://localhost/joinCalendar/'+$lastInsertRow['link'];
+        echo 'http://localhost/joincalendar/' . $lastInsertRow['link'];
     }
 
-    
 
 }
 

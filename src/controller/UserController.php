@@ -58,6 +58,8 @@ class UserController extends BaseController{
     public function addSchedule(){
         if(!isPost()) return;
 
+        
+
         $schedule_name =  cleanRequest($_POST['schedule_title']);
         $schedule_description = cleanRequest($_POST['schedule_description']);
         $schedule_start =  cleanRequest($_POST['schedule_start']);
@@ -66,6 +68,22 @@ class UserController extends BaseController{
         $schedule_type =  cleanRequest($_POST['schedule_type']);
         $color_hue =  cleanRequest($_POST['color_hue']);
         $calendar_id = cleanRequest($_POST['calendar_id']);
+
+        $calendarUserAssoc = new CalendarUserModel();
+        $canEdit = false;
+        $results = $calendarUserAssoc->getAllWithColumn('user_id', Auth::getUserId());
+
+        foreach($results as $row){
+            if($row['calendar_id'] == $calendar_id){
+                $canEdit = ($row['privilage_level'] <= 1); //ony accepts 0 = creator, 1 = editor
+                break;
+            }
+        }
+
+        if(!$canEdit){
+            echo "You have no privilage to add a schedule!";
+            exit();
+        };
         
         
     
@@ -121,7 +139,7 @@ class UserController extends BaseController{
             'status' => 'success',
             'message' => 'Data fetched successfully',
             'data' => [
-                'calendars' => $userCalendarAssoc->getAllFromRelatedModel('tb_calendar_model', 'calendar_id', 'user_id', Auth::getUserId(), $select = 'tb_calendar_model.id, calendar_name')
+                'calendars' => $userCalendarAssoc->getAllFromRelatedModel('tb_calendar_model', 'calendar_id', 'user_id', Auth::getUserId(), $select = 'tb_calendar_model.id, calendar_name, privilage_level')
             ]
         );
 
@@ -144,7 +162,7 @@ class UserController extends BaseController{
 
         foreach($results as $row){
             if($row['calendar_id'] == $calendar_id){
-                $canView = ($row['privilage_level'] <= 1);
+                $canView = ($row['privilage_level'] <= 2); //only accepts 0 = creator, 1 = editor, 2 = viewer
                 break;
             }
         }
@@ -176,6 +194,22 @@ class UserController extends BaseController{
         $color_hue = cleanRequest($_POST['color_hue']);
         $calendar_id = cleanRequest($_POST['calendar_id']);
 
+        $calendarUserAssoc = new CalendarUserModel();
+        $canEdit = false;
+        $results = $calendarUserAssoc->getAllWithColumn('user_id', Auth::getUserId());
+
+        foreach($results as $row){
+            if($row['calendar_id'] == $calendar_id){
+                $canEdit = ($row['privilage_level'] <= 1); //only accepts 0 = creator, 1 = editor
+                break;
+            }
+        }
+
+        if(!$canEdit) {
+            echo 'You have no privilage to add a note!';
+            exit();
+        }
+
         $noteModel = new NoteModel();
 
         $noteModel->insert([
@@ -198,7 +232,7 @@ class UserController extends BaseController{
 
         foreach($results as $row){
             if($row['calendar_id'] == $calendar_id){
-                $canView = ($row['privilage_level'] <= 1);
+                $canView = ($row['privilage_level'] <= 2);
                 break;
             }
         }
