@@ -1,0 +1,77 @@
+<?php
+namespace Src\Controller;
+
+
+use Src\Model\CalendarUserModel;
+use Src\Middleware\Auth;
+use Src\Model\CalendarModel;
+use Src\Model\CalendarLinkShareModel;
+use Src\Model\ReminderModel;
+use Src\Model\ScheduleModel;
+use Src\Model\UserModel;
+use Src\Model\NoteModel;
+
+class CalendarShareController extends BaseController{
+
+    public function joinCalendar($link){
+        if(!Auth::user()) redirect("login_account_get");
+
+        //echo $link;
+        
+        $calendarShareModel = new CalendarLinkShareModel();
+
+        $calendarShareRow = $calendarShareModel->getColumn('link', $link);
+
+        //var_dump($calendarShareRow);
+
+    }
+
+    public function createCalendarLink(){
+        if(!Auth::user() || !isPost()) redirect("login_account_get");
+
+    
+        $userId = Auth::getUserId();
+
+        
+
+        $calendarUserAssoc = new CalendarUserModel();
+
+        $result_set = $calendarUserAssoc->getAllWithColumn('user_id', $userId);
+
+        $calendar_id = cleanRequest($_POST['calendar_id']);
+        $privilage_level  = cleanRequest($_POST['privilage_level'] );
+
+        //check if user has permission before creating a link
+        $hasPermission = false;
+        foreach($result_set as $row){
+            if($row['calendar_id'] == $calendar_id && $row['user_id'] == $userId){
+                $hasPermission = $row['privilage_level'] <= 1;
+                break;
+            }
+        }
+
+        if(!$hasPermission) echo "Cannot share this calendar..."; //return if has no permission
+
+        $calendarLinkShareModel = new CalendarLinkShareModel();
+
+        $row = [
+            'user_id' => $userId,
+            'link' => 'UUID()',
+            'calendar_id' => $calendar_id,
+            'privilage_level' => $privilage_level,
+            'duration' => 5
+        ];
+
+        
+        $calendarLinkShareModel->insert($row);
+
+        $lastInsertRow = $calendarLinkShareModel->lastInsertRow;
+
+        echo 'http://localhost/joinCalendar/'+$lastInsertRow['link'];
+    }
+
+    
+
+}
+
+?>

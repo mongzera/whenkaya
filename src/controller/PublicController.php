@@ -4,6 +4,7 @@ namespace Src\Controller;
 
 use Src\Model\CalendarUserModel;
 use Src\Middleware\Auth;
+use Src\Model\CalendarLinkShareModel;
 use Src\Model\CalendarModel;
 use Src\Model\EventModel;
 use Src\Model\ReminderModel;
@@ -17,6 +18,8 @@ class PublicController extends BaseController{
         if(Auth::user()) redirect("dashboard");
         redirect("login_account_get");
     }
+
+    
 
     public function migrate(){
         $user = new UserModel();
@@ -33,6 +36,10 @@ class PublicController extends BaseController{
 
         $noteModel = new NoteModel();
         $noteModel->migrate();
+
+        $calendarLinkShareModel = new CalendarLinkShareModel();
+
+        $calendarLinkShareModel->migrate();
 
 
         //var_dump($userCalendarAssoc->getAllFromRelatedModel('tb_calendar_model', 'calendar_id', 'user_id', Auth::getUserId()));

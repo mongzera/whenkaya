@@ -135,7 +135,7 @@
 }
 
 .add-button:hover{
-    color: #000;
+    color: #000 ;
     background-color: var(--light-bg);
 }
 
@@ -252,6 +252,10 @@
     padding: 0px !important;
 }
 
+.form-submit:hover{
+    background-color: var(--dark-blue)  !important;
+}
+
 .create-schedule:hover{
     background-color: var(--light-blue) !important;
 }
@@ -332,7 +336,23 @@
 
 .note-desc p{
     overflow: hidden;
-    
     word-wrap: break-word;
-    
+}
+
+.share-calendar-popup{
+    position: absolute;
+    max-width: 350px;
+    max-height: 70px;
+    min-width: 350px;
+    min-height: 70px;
+    background-color: white;
+    border: 1px solid var(--dark-hl);
+    border-radius: 25px;
+    /*box-shadow: 5px 5px 2px 2px rgba(0, 0, 0, 0.1);*/
+    padding: 0px 5px 0px 5px;
+} 
+
+
+.share-calendar-popup[hide=true]{
+    display: none;
 }

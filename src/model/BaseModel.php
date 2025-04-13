@@ -17,6 +17,7 @@ abstract class BaseModel{
     private $constraintCount = 0;
     private $row;
     private $result_set;
+    public $lastInsertRow;
 
     public function getId(int $id) : array{
         return $this->getColumn('id', $id);
@@ -32,8 +33,8 @@ abstract class BaseModel{
 
         
 
-        $this->row = $stmt->fetchAll()[0];
-        return $this->row;
+        //$this->row;
+        return $this->row = $stmt->fetchAll()[0] ?? null;
     }
 
     public function getAllWithColumn($columnname, $value){
@@ -61,7 +62,9 @@ abstract class BaseModel{
     }
 
 
-
+    public function lastInsertRow(){
+        return $this->lastInsertRow;
+    }
 
     public function insert($data){
         $conn = connect_db();
@@ -77,7 +80,7 @@ abstract class BaseModel{
 
         $status = $stmt->execute();
 
-        $this->getId($conn->lastInsertId());
+        $this->lastInsertRow = $this->getId($conn->lastInsertId());
 
         return $status;
     }
