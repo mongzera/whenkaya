@@ -15,3 +15,16 @@
 .text-left{
     text-align: left;
 }
+
+.popMessages{
+    position: absolute;
+    top: 0px;
+    left: 20px;
+}
+
+.popMsg{
+    border: 1px solid var(--dark-hl);
+    border-radius: 15px;
+    width: 300px;
+    height: 70px;
+}

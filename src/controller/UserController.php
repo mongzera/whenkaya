@@ -22,8 +22,9 @@ class UserController extends BaseController{
 
         $static = [
             "css" => ['css/global.css', 'css/theme.css', 'css/dashboard.css'],
-            "js"  => ['js/calendar.js', 'js/app.js']
+            "js"  => ['js/calendar.js', 'js/app.js'],
         ];
+
 
         render_page($content, $static);
     }

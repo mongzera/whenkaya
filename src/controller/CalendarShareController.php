@@ -31,13 +31,33 @@ class CalendarShareController extends BaseController{
 
         $calendarUserAssoc = new CalendarUserModel();
 
-        $calendarUserAssoc->insert([
+        $alreadyJoinedTheCalendar = false;
+
+        foreach($calendarUserAssoc->getAllWithColumn('user_id', Auth::getUserId()) as $calendarAssoc){
+            if($calendarAssoc['calendar_id'] == $calendarId){
+                $alreadyJoinedTheCalendar = true;
+                break;
+            }
+        }
+
+
+
+        if(!$alreadyJoinedTheCalendar){
+            $calendarUserAssoc->insert([
             
-            'user_id' => Auth::getUserId(),
-            'calendar_id' => $calendarId,
-            'privilage_level' => $calendarShareRow['privilage_level']
-            
-        ]);
+                'user_id' => Auth::getUserId(),
+                'calendar_id' => $calendarId,
+                'privilage_level' => $calendarShareRow['privilage_level']
+                
+            ]);
+
+            addMessage('Succesfully joined the calendar!', 'success');
+        }else{
+            addMessage('You are already in the calendar!', $status = 'error');
+            addMessage('You are already in the calendar!', $status = 'error');
+            addMessage('You are already in the calendar!', $status = 'error');
+            addMessage('You are already in the calendar!', $status = 'error');
+        }
 
         redirect('dashboard');
     }
@@ -66,7 +86,10 @@ class CalendarShareController extends BaseController{
             }
         }
 
-        if(!$hasPermission) echo "Cannot share this calendar..."; //return if has no permission
+        if(!$hasPermission) {
+            echo "Cannot share this calendar..."; //return if has no permission
+            exit();
+        }
 
         $calendarLinkShareModel = new CalendarLinkShareModel();
 

@@ -1,9 +1,9 @@
 (() => {
 
-    let cardFactory = (timeStart, timeEnd, title, desc, idx) => {
+    let cardFactory = (timeStart, timeEnd, title, desc, idx, calendarId) => {
         let cardHTML = 
         `
-                    <div class="card flex flex-row align-center" id='calendar-card-${idx}'>
+                    <div class="card flex flex-row align-center" id='calendar-card-${idx}' identifier='${calendarId}'>
                         <div class="time flex flex-col">
                             <div class="start-time flex justify-center">
                                 ${timeStart}
@@ -29,14 +29,14 @@
         return cardHTML;
     }
 
-    let noteFactory = (title, desc, idx) => {
+    let noteFactory = (title, desc, idx, noteId) => {
         title = title.trim();
         desc = desc.trim();
         console.log(title);
         console.log(desc);
         let noteHTML = 
         `
-                    <div class="note flex flex-row align-center" id='calendar-note-${idx}'>
+                    <div class="note flex flex-row align-center" id='calendar-note-${idx}' identifier='${noteId}'>
                         <div class='handle flex align-center'>
                             <svg fill="#555555" width="48px" height="48px" viewBox="-87.04 -87.04 430.08 430.08" id="Flat" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="15.872"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="2.56"></g><g id="SVGRepo_iconCarrier"> <path d="M100,60.0001a8,8,0,1,1-8-8A8.00008,8.00008,0,0,1,100,60.0001Zm64,8a8,8,0,1,0-8-8A8.00008,8.00008,0,0,0,164,68.0001Zm-72,52a8,8,0,1,0,8,8A7.99977,7.99977,0,0,0,92,120.0001Zm72,0a8,8,0,1,0,8,8A7.99977,7.99977,0,0,0,164,120.0001Zm-72,68a8,8,0,1,0,8,8A7.99977,7.99977,0,0,0,92,188.0001Zm72,0a8,8,0,1,0,8,8A7.99977,7.99977,0,0,0,164,188.0001Z"></path> </g></svg>
                             </div>
@@ -151,6 +151,10 @@
             this._targetDate.month = dateObject.getMonth();
             this._targetDate.year = dateObject.getFullYear();
             this._targetDate.dateObject = dateObject;
+
+            //clear schedule and notes
+            document.getElementById('cards_container').innerHTML = "";
+            document.getElementById('notes-container').innerHTML = "";
 
             //console.log(this._targetDate);
 
@@ -371,7 +375,7 @@
     let updateCurrentDateCards = (currentDate) => {
         let cardsContainer = document.getElementById('cards_container');
         //clear
-        cardsContainer.innerHTML = "";
+        //cardsContainer.innerHTML = "";
 
         if(_states.user_calendars === undefined || _states.user_calendars.length == 0) return;
 
@@ -425,7 +429,7 @@
 
             console.log("REQUESTED CURRENT SCHEDULES");
 
-            cardsContainer.innerHTML = "";
+            //cardsContainer.innerHTML = "";
             response.data["user_schedules"].forEach((element, i) => {
 
                 _statesUpdateUserSchedule(element);
@@ -433,10 +437,23 @@
                 if(element.calendar_id != _states.user_calendars[_states.current_calendar.id].id) return; //check date
                 if(!checkDate(_states.current_date, element)) return;
                 
+
+                let cards = cardsContainer.querySelectorAll('.card');
+                //console.log(cards);
+                let wasAddedAlready = false;
+
+                cards.forEach(c => {
+                    //console.log("IDENTIFIER: " + c.getAttribute('identifier') == element['id']);
+                    if(c.getAttribute('identifier') == element['id']){
+                        wasAddedAlready = true;
+                    }
+                });
                 
-                cardsContainer.innerHTML += cardFactory(element['schedule_start'], element['schedule_end'], element['schedule_title'], element['schedule_description'], i);
-                let card = document.getElementById('calendar-card-' + i);
-                card.style.backgroundColor = `hsl(${element['color_hue']}, 55%, 70%)`;
+                if(!wasAddedAlready) {
+                    cardsContainer.innerHTML += cardFactory(element['schedule_start'], element['schedule_end'], element['schedule_title'], element['schedule_description'], i, element['id']);
+                    let card = document.getElementById('calendar-card-' + i);
+                    card.style.backgroundColor = `hsl(${element['color_hue']}, 55%, 70%)`;
+                }
             });
         });
 
@@ -451,7 +468,7 @@
         
         let notesContainer = document.getElementById('notes-container');
         //clear
-        notesContainer.innerHTML = "";
+        //notesContainer.innerHTML = "";
         
         if(_states.user_calendars === undefined || _states.user_calendars.length == 0) return;
 
@@ -504,7 +521,7 @@
 
             if(status !== 'success') return;
 
-            notesContainer.innerHTML = "";
+            //notesContainer.innerHTML = "";
             
             response.data["user_notes"].forEach((element, i) => {
                 
@@ -512,7 +529,23 @@
                 if(!checkDate(_states.current_date, element)) return;
 
                 _statesUpdateUserNote(element);
-                notesContainer.innerHTML += noteFactory(element['note_title'], element['note_description'], i);
+
+
+                let notes = notesContainer.querySelectorAll('.note');
+                //console.log(cards);
+                let wasAddedAlready = false;
+
+                notes.forEach(c => {
+                    //console.log("IDENTIFIER: " + c.getAttribute('identifier') == element['id']);
+                    if(c.getAttribute('identifier') == element['id']){
+                        wasAddedAlready = true;
+                    }
+                });
+
+                if(!wasAddedAlready){
+                    notesContainer.innerHTML += noteFactory(element['note_title'], element['note_description'], i, element['id']);
+
+                }
                 
             });
         });
@@ -574,6 +607,8 @@
 
         _states.updateDisplayDate = updateDisplayDate;
 
+        showAll();
+
         _states.updateAll = () => {
             _states.updateDisplayDate();
         }
@@ -581,7 +616,7 @@
        // _states.updateAll();
 
         
-        showAll();
+        
 
         //_states.updateAll();
 
@@ -605,5 +640,9 @@
         });
 
         //set calendarState.setTargetDate
+
+        setInterval(()=>{
+            _states.updateAll();
+        }, 1500);
     }
 })();
