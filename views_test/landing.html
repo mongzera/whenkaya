@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Whenkaya - Your Daily Updater</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Segoe UI", sans-serif;
+      line-height: 1.6;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 30px 50px;
+      background: #fff;
+    }
+
+    header h1 {
+      font-size: 1.8em;
+    }
+
+    header span {
+      font-weight: normal;
+      font-size: 0.7em;
+      display: block;
+      margin-top: -5px;
+      color: #555;
+    }
+
+    nav a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .section {
+      text-align: center;
+      padding: 80px 30px;
+    }
+
+    .section img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .section h2 {
+      font-size: 2em;
+      margin-top: 30px;
+    }
+
+    .brown {
+      background: #b37847;
+      color: white;
+    }
+
+    .blue {
+      background: #4d88b5;
+      color: white;
+    }
+
+    .green {
+      background: #a5b948;
+      color: white;
+    }
+
+    .text-image-pair {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+    }
+
+    @media (min-width: 768px) {
+      .text-image-pair {
+        flex-direction: row;
+        justify-content: space-around;
+      }
+
+      .section h2 {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <p style="font-size: 50px;">whenkaya</p>
+      <span style="font-size: 20px">YOUR DAILY UPDATER</span>
+    </div>
+    
+    <nav>
+      <a href="#"><p style="font-size: 10px;">Create Account</style></a>
+      <a href="#">Sign in</a>
+    </nav>
+  </header>
+
+  <section class="section">
+    <img src="images/image 1.png" alt="App preview" />
+  </section>
+
+  <section class="section brown">
+    <div class="text-image-pair">
+      <h2>Need help managing your schedule?</h2>
+      <img src="images/3dcalendar 1.png" alt="Calendar graphic" width="250" />
+    </div>
+  </section>
+
+  <section class="section blue">
+    <div class="text-image-pair">
+
+      <img src="images/sched_blocks_3d 1.png" alt="Colorful task cards" width="250" />
+      <h2>Tired of using complex productivity tools?</h2>
+  
+    </div>
+  </section>
+
+  <section class="section green">
+    <div class="text-image-pair">
+      <h2>If only there’s a simple yet capable tool out there</h2>
+      <img src="images/3dcalendar 1.png" alt="Simplified calendar graphic" width="250" />
+    </div>
+  </section>
+
+</body>
+</html>

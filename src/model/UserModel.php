@@ -3,6 +3,7 @@ namespace Src\Model;
 use Src\Model\BaseModel;
 
 class UserModel extends BaseModel{
+    
     function __construct(){
         $this->table_name = "tb_user_model";
 

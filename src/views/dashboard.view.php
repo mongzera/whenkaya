@@ -58,11 +58,15 @@ use Src\Middleware\Auth;
 <!--ends here-->
 
 <div class="container flex flex-row " id='container'>
-        <div class="sidebar px-1 border-right">
-            <div class="profile flex align-center">
-                <h3><?php echo Auth::getUserName() ?></h3>
-            </div>
-            <div class="calendars">
+
+<div class="sidebar px-1 border-right">
+    <div class="profile flex align-center justify-between" style="width: 50%;">
+        <h3><?php echo Auth::getUserName(); ?></h3>
+        <form action="logout" method="post">
+            <button type="submit" class="logout-btn" style="padding: 3px 7px;border-radius: 5px; margin-left: 15px; background-color: white">Logout</button>
+        </form>
+    </div>
+            <div class="calendars"> 
                 <span class="flex flex-row justify-between align-center"><h3>Calendars</h3><button class='calendar-button' id='add-calendar-btn'>+</button></span>
                 <div id="calendar-list" class="calendar-list flex flex-col"></div>
             </div>
