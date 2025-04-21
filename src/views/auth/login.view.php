@@ -11,3 +11,7 @@
         </div>
     </form>
 </div>
+<div class="auth-footer">
+            <p>Doesn't have an account? <a href="/create-account">Register</a></p>
+        </div>
+    </div>

@@ -72,8 +72,17 @@ class AuthenticationController extends BaseController
                 $isAllInputValid = false;
             }
 
-            // Convert array of errors to one HTML string
-            $error = join("<br>", array_map(fn($msg) => "<p style='color:red;'>$msg</p>", $errorMessages));
+            $errors = [];
+
+            foreach ($errorMessages as $msg) {
+                if (str_contains($msg, "First name")) $errors['firstname'] = $msg;
+                if (str_contains($msg, "Last name")) $errors['lastname'] = $msg;
+                if (str_contains($msg, "Username")) $errors['username'] = $msg;
+                if (str_contains($msg, "Email")) $errors['email'] = $msg;
+                if (str_contains($msg, "Password") && !str_contains($msg, "mismatch")) $errors['password'] = $msg;
+                if (str_contains($msg, "mismatch")) $errors['retype-password'] = $msg;
+            }
+            
 
             // If all good, insert user
             if ($isAllInputValid) {
@@ -91,7 +100,7 @@ class AuthenticationController extends BaseController
                     Auth::authenticate_user($username, $password);
                     redirect("dashboard");
                 } else {
-                    $error = "<p style='color:red;'>Account creation failed. Please try again.</p>";
+                    $errors = "<p style='color:red;'>Account creation failed. Please try again.</p>";
                 }
             }
         }
@@ -100,7 +109,7 @@ class AuthenticationController extends BaseController
             "title" => "Create Account",
             "head" => "../src/views/default_head.php",
             "body" => "../src/views/auth/create-account.view.php",
-            "error" => $error,
+            "errors" => $errors,
         ];
 
         $static = [
