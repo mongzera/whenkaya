@@ -62,7 +62,7 @@ use Src\Middleware\Auth;
 <div class="sidebar px-1 border-right">
     <div class="profile flex align-center justify-between" style="width: 50%;">
         <h3><?php echo Auth::getUserName(); ?></h3>
-        <form action="logout" method="post">
+        <form action="logout" method="get">
             <button type="submit" class="logout-btn" style="padding: 3px 7px;border-radius: 5px; margin-left: 15px; background-color: white">Logout</button>
         </form>
     </div>

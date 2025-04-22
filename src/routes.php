@@ -8,6 +8,7 @@ function create_routes($router){
 
 function create_get_routes($router){
      $router->map("GET", "/", 'PublicController::index', 'home');
+     $router->map("GET", "/landing", 'PublicController::landing', 'landing');
      $router->map("GET", "/create-account", "AuthenticationController::create_account", 'create_account_get');
      $router->map("GET", "/login", "AuthenticationController::login_account", 'login_account_get');
      $router->map("GET", "/dashboard", "UserController::dashboard", "dashboard");
