@@ -99,3 +99,11 @@
     padding: 0px 0px 0px 25px;
     margin: 5px 0px 5px 0px;
 }
+
+.truncate{
+    width: 290px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+}

@@ -207,7 +207,7 @@ let _states = {
         
         if(!hasPopupModal) { 
             popup.style.transform = "translateX(200px)";
-            popup.setAttribute('class', 'share-calendar-popup flex flex-row align-center justify-around');
+            popup.setAttribute('class', 'share-calendar-popup flex flex-col justify-around');
             popup.setAttribute('id', 'popup-'+_states.current_calendar.idx);
             popup.setAttribute('hide', true);
             calendarItemPopups.push(popup.id);
@@ -225,7 +225,21 @@ let _states = {
                     console.log(data);
                     console.log(status);
 
-                    navigator.clipboard.writeText(data)
+                    let uri = window.location.origin + data;
+                    console.log(uri);
+
+                    let textAreaContainer = popup.querySelector(`.link-for-${_states.current_calendar.idx}`);
+                    let textArea = document.createElement('textarea');
+                    textArea.style.width = "300px";
+                    textArea.style.height = "35px";
+                    textArea.style.resize = 'none';
+                    textArea.value = uri;
+                    textAreaContainer.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    
+
+                    navigator.clipboard.writeText(window.location.origin + data)
                     .then(() => {
                         console.log('Text copied!');
                     })
@@ -250,17 +264,31 @@ let _states = {
             }
 
             let popupInner = `
-                <div><label for='privilage_level'>Privilage Level:</label><select id='privilageLvl-${_states.current_calendar.idx}' name='privilage_level'>
-                    <option value="1">Can Edit</option>
-                    <option value="2">Can View Only</option>
-                </select></div>
+                <div  class='flex flex-col'>
+                    <div style='flex flex-row justify-center' id='copy-link-${_states.current_calendar.idx}'>
+                            <label for='privilage_level'>Privilage Level:</label>
+                            <select id='privilageLvl-${_states.current_calendar.idx}' name='privilage_level'>
+                                <option value="1">Can Edit</option>
+                                <option value="2">Can View Only</option>
+                            </select>
+                    </div>
+                
+                    <div style="width: 100%" class='flex align-center justify-center link-for-${_states.current_calendar.idx}'>
+                        
+                    </div>
+                </div>
+                
+                
             `;
 
             popup.innerHTML = popupInner;
-
-            popup.appendChild(copyLinkBtn);
-
             calendarItem.appendChild(popup); 
+
+            let cpyLinkDiv = popup.querySelector(`#copy-link-${_states.current_calendar.idx}`)
+            cpyLinkDiv.appendChild(copyLinkBtn);
+
+
+
         }   
 
 

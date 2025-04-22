@@ -106,7 +106,7 @@ class CalendarShareController extends BaseController{
 
         $lastInsertRow = $calendarLinkShareModel->lastInsertRow;
 
-        echo 'http://localhost/joincalendar/' . $lastInsertRow['link'];
+        echo '/joincalendar/' . $lastInsertRow['link'];
     }
 
 
