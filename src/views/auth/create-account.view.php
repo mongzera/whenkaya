@@ -34,10 +34,9 @@
             <?php endif; ?>
 
             <input type="submit" value="Create Account" class="auth-input-field auth-submit">
-        </div>
-    </form>
-</div>
-        <div class="auth-footer">
             <p>Already have an account? <a href="/login">Login</a></p>
         </div>
-    </div>
+        
+    </form>
+</div>
+       

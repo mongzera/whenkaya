@@ -47,7 +47,7 @@ class AuthenticationController extends BaseController
                 $errorMessages[] = "Username cannot be blank!";
                 $isAllInputValid = false;
             } elseif (!preg_match('/^[a-zA-Z0-9._-]{3,30}$/', $username)) {
-                $errorMessages[] = "Username must be 3–30 characters and use letters, numbers, dots, underscores, or hyphens.";
+                $errorMessages[] = "Username must use letters, numbers, dots, underscores, or hyphens.";
                 $isAllInputValid = false;
             }
 
@@ -75,12 +75,24 @@ class AuthenticationController extends BaseController
             $errors = [];
 
             foreach ($errorMessages as $msg) {
-                if (str_contains($msg, "First name")) $errors['firstname'] = $msg;
-                if (str_contains($msg, "Last name")) $errors['lastname'] = $msg;
-                if (str_contains($msg, "Username")) $errors['username'] = $msg;
-                if (str_contains($msg, "Email")) $errors['email'] = $msg;
-                if (str_contains($msg, "Password") && !str_contains($msg, "mismatch")) $errors['password'] = $msg;
-                if (str_contains($msg, "mismatch")) $errors['retype-password'] = $msg;
+                if (str_contains($msg, "First name")) {
+                    $errors['firstname'] = "<p style='font-size: 0.65em; color:red; margin: 5px 0; text-align: center;'>$msg</p>";
+                }
+                if (str_contains($msg, "Last name")) {
+                    $errors['lastname'] = "<p style='font-size: 0.65em; color:red; margin: 5px 0; text-align: center;'>$msg</p>";
+                }
+                if (str_contains($msg, "Username")) {
+                    $errors['username'] = "<p style='font-size: 0.65em; color:red; margin: 5px 0; text-align: center;'>$msg</p>";
+                }
+                if (str_contains($msg, "Email")) {
+                    $errors['email'] = "<p style='font-size: 0.65em; color:red; margin: 5px 0; text-align: center;'>$msg</p>";
+                }
+                if (str_contains($msg, "Password") && !str_contains($msg, "mismatch")) {
+                    $errors['password'] = "<p style='font-size: 0.65em; color:red; margin: 5px 0; text-align: center;'>$msg</p>";
+                }
+                if (str_contains($msg, "mismatch")) {
+                    $errors['retype-password'] = "<p style='font-size: 0.65em; color:red; margin: 5px 0; text-align: center;'>$msg</p>";
+                }
             }
             
 
