@@ -19,7 +19,21 @@ class PublicController extends BaseController{
         redirect("login_account_get");
     }
 
-    
+    public function landing (){
+        $content = [
+            "title" => "hello",
+            "head" => "../src/views/default_head.php",
+            "body" => "../src/views/landing.php" 
+        ];
+
+        $static = [
+            "css" => ['css/global.css', 'css/theme.css'],
+            "js"  => ['js/calendar.js', 'js/app.js'],
+        ];
+        
+        render_page($content,   $static);
+        
+    }
 
     public function migrate(){
         $user = new UserModel();
