@@ -104,22 +104,22 @@
     
     <nav style="font-size: 25px; margin-right: 200px; margin-top: 50px"> 
       <a href="create-account">Create Account</a>
-      <a href="login">Sign in</a>
+      <a href="login">Log in</a>
     </nav>
   </header>
 
-  <section class="section" style="margin-top: 100px ">
+  <section class="section" style="margin-top: 100px; height: 350px; ">
     <img src="images/image 1.png" alt="App preview" position="absolute" />
   </section>
 
-  <section class="section brown" >
+  <section class="section brown"  style="padding-top: 700px; height: 1000px;" >
     <div class="text-image-pair">
       <h2>Need help managing your schedule?</h2>
       <img src="images/3dcalendar 1.png" alt="Calendar graphic" width="250" />
     </div>
   </section>
 
-  <section class="section blue">
+  <section class="section blue" style="">
     <div class="text-image-pair">
 
       <img src="images/sched_blocks_3d 1.png" alt="Colorful task cards" width="250" />

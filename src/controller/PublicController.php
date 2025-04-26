@@ -16,13 +16,13 @@ class PublicController extends BaseController{
 
     public function index(){
         if(Auth::user()) redirect("dashboard");
-        redirect("login_account_get");
+        Auth::redirectIfNotLoggedIn();
     }
 
     public function landing (){
         $content = [
             "title" => "hello",
-            "head" => "../src/views/default_head.php",
+            //"head" => "../src/views/default_head.php",
             "body" => "../src/views/landing.php" 
         ];
 

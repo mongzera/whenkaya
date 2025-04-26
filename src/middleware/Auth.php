@@ -17,7 +17,7 @@ class Auth{
     }
 
     public static function redirectIfNotLoggedIn(){
-        if(!Auth::user()) redirect("home");
+        if(!Auth::user()) redirect("landing");
     }
 
     public static function authenticate_user($username, $password){
