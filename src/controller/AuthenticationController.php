@@ -12,8 +12,14 @@ class AuthenticationController extends BaseController
     {
         if (Auth::user()) redirect("dashboard");
 
-        $error = "";
-        $errorMessages = [];
+        $errors = [
+            'firstname' => '',
+            'lastname' => '',
+            'username' => '',
+            'email' => '',
+            'password' => '',
+            'retype_password' => ''
+        ];
 
         if (isPost()) {
             $firstname = cleanRequest($_POST['firstname']);
@@ -25,76 +31,51 @@ class AuthenticationController extends BaseController
 
             $isAllInputValid = true;
 
-            // Check required fields
+            // Validate inputs one by one and break on first error
             if (empty($firstname)) {
-                $errorMessages[] = "First name cannot be blank!";
+                $errors['firstname'] = "First name cannot be blank!";
                 $isAllInputValid = false;
             } elseif (!preg_match('/^[a-zA-Z]+$/', $firstname)) {
-                $errorMessages[] = "First name must only contain letters!";
-                $isAllInputValid = false;
-            }
-            
-            if (empty($lastname)) {
-                $errorMessages[] = "Last name cannot be blank!";
-                $isAllInputValid = false;
-            } elseif (!preg_match('/^[a-zA-Z]+$/', $lastname)) {
-                $errorMessages[] = "Last name must only contain letters!";
-                $isAllInputValid = false;
-            }
-            
-
-            if (empty($username)) {
-                $errorMessages[] = "Username cannot be blank!";
-                $isAllInputValid = false;
-            } elseif (!preg_match('/^[a-zA-Z0-9._-]{3,30}$/', $username)) {
-                $errorMessages[] = "Username must use letters, numbers, dots, underscores, or hyphens.";
+                $errors['firstname'] = "First name must only contain letters!";
                 $isAllInputValid = false;
             }
 
-            if (empty($email)) {
-                $errorMessages[] = "Email cannot be blank!";
+            if ($isAllInputValid && empty($lastname)) {
+                $errors['lastname'] = "Last name cannot be blank!";
                 $isAllInputValid = false;
-            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $errorMessages[] = "Invalid email format!";
-                $isAllInputValid = false;
-            }
-
-            if (empty($password)) {
-                $errorMessages[] = "Password cannot be blank!";
-                $isAllInputValid = false;
-            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/', $password)) {
-                $errorMessages[] = "Password must be at least 8 characters and include uppercase, lowercase, number, and special character.";
+            } elseif ($isAllInputValid && !preg_match('/^[a-zA-Z]+$/', $lastname)) {
+                $errors['lastname'] = "Last name must only contain letters!";
                 $isAllInputValid = false;
             }
 
-            if ($password !== $retype_password) {
-                $errorMessages[] = "Password mismatch!";
+            if ($isAllInputValid && empty($username)) {
+                $errors['username'] = "Username cannot be blank!";
+                $isAllInputValid = false;
+            } elseif ($isAllInputValid && !preg_match('/^[a-zA-Z0-9._-]{3,30}$/', $username)) {
+                $errors['username'] = "Username must use letters, numbers,<br>dots, underscores, or hyphens.";
                 $isAllInputValid = false;
             }
 
-            $errors = [];
-
-            foreach ($errorMessages as $msg) {
-                if (str_contains($msg, "First name")) {
-                    $errors['firstname'] = "<p style='font-size: 0.65em; color:red; margin: 5px 0; text-align: center;'>$msg</p>";
-                }
-                if (str_contains($msg, "Last name")) {
-                    $errors['lastname'] = "<p style='font-size: 0.65em; color:red; margin: 5px 0; text-align: center;'>$msg</p>";
-                }
-                if (str_contains($msg, "Username")) {
-                    $errors['username'] = "<p style='font-size: 0.65em; color:red; margin: 5px 0; text-align: center;'>$msg</p>";
-                }
-                if (str_contains($msg, "Email")) {
-                    $errors['email'] = "<p style='font-size: 0.65em; color:red; margin: 5px 0; text-align: center;'>$msg</p>";
-                }
-                if (str_contains($msg, "Password") && !str_contains($msg, "mismatch")) {
-                    $errors['password'] = "<p style='font-size: 0.65em; color:red; margin: 5px 0; text-align: center;'>$msg</p>";
-                }
-                if (str_contains($msg, "mismatch")) {
-                    $errors['retype-password'] = "<p style='font-size: 0.65em; color:red; margin: 5px 0; text-align: center;'>$msg</p>";
-                }
+            if ($isAllInputValid && empty($email)) {
+                $errors['email'] = "Email cannot be blank!";
+                $isAllInputValid = false;
+            } elseif ($isAllInputValid && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors['email'] = "Invalid email format!";
+                $isAllInputValid = false;
             }
-            
+
+            if ($isAllInputValid && empty($password)) {
+                $errors['password'] = "Password cannot be blank!";
+                $isAllInputValid = false;
+            } elseif ($isAllInputValid && !preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/', $password)) {
+                $errors['password'] = "Password must be at least 8 characters<br>and include uppercase, lowercase,<br>number, and special character.";
+                $isAllInputValid = false;
+            }
+
+            if ($isAllInputValid && $password !== $retype_password) {
+                $errors['retype_password'] = "Password mismatch!";
+                $isAllInputValid = false;
+            }
 
             // If all good, insert user
             if ($isAllInputValid) {
@@ -112,7 +93,7 @@ class AuthenticationController extends BaseController
                     Auth::authenticate_user($username, $password);
                     redirect("dashboard");
                 } else {
-                    $errors = "<p style='color:red;'>Account creation failed. Please try again.</p>";
+                    $errors['general'] = "Account creation failed. Please try again.";
                 }
             }
         }
@@ -122,6 +103,7 @@ class AuthenticationController extends BaseController
             "head" => "../src/views/default_head.php",
             "body" => "../src/views/auth/create-account.view.php",
             "errors" => $errors,
+            "old" => $_POST ?? [] // Pass old input values back to form
         ];
 
         $static = [
@@ -136,8 +118,11 @@ class AuthenticationController extends BaseController
     {
         if (Auth::user()) redirect("dashboard");
 
-        $error = "";
-        $errorMessages = [];
+        $errors = [
+            'username' => '',
+            'password' => '',
+            'general' => ''
+        ];
 
         if (isPost()) {
             $username = cleanRequest($_POST['username']);
@@ -145,12 +130,12 @@ class AuthenticationController extends BaseController
             $isAllInputValid = true;
 
             if (empty($username)) {
-                $errorMessages[] = "Username cannot be blank!";
+                $errors['username'] = "Username cannot be blank!";
                 $isAllInputValid = false;
             }
 
-            if (empty($password)) {
-                $errorMessages[] = "Password cannot be blank!";
+            if ($isAllInputValid && empty($password)) {
+                $errors['password'] = "Password cannot be blank!";
                 $isAllInputValid = false;
             }
 
@@ -158,18 +143,17 @@ class AuthenticationController extends BaseController
                 if (Auth::authenticate_user($username, $password)) {
                     redirect("dashboard");
                 } else {
-                    $errorMessages[] = "Invalid username or password!";
+                    $errors['general'] = "Invalid username or password!";
                 }
             }
-
-            $error = join("<br>", array_map(fn($msg) => "<p style='color:red;'>$msg</p>", $errorMessages));
         }
 
         $content = [
             "title" => "Login Account",
             "head" => "../src/views/default_head.php",
             "body" => "../src/views/auth/login.view.php",
-            "error" => $error
+            "errors" => $errors,
+            "old" => $_POST ?? []
         ];
 
         $static = [
