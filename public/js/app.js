@@ -293,42 +293,47 @@ let _states = {
 
     //add new schedule
     let newCalendarBtn = document.getElementById('add-calendar-btn');
-    newCalendarBtn.onclick = () => {
-
-        if(newCalendarBtn.hasAttribute('creating')) return;
+        newCalendarBtn.onclick = () => {
+        if (newCalendarBtn.hasAttribute('creating')) return;
         newCalendarBtn.toggleAttribute("creating");
-
+    
         let calendarList = document.getElementById('calendar-list');
-        let calendar_name_inp = document.createElement('input'); //schedule name input
-        calendar_name_inp.setAttribute('id', 'new-calendar-inp')
+        let calendar_name_inp = document.createElement('input'); // Calendar name input
+        calendar_name_inp.setAttribute('id', 'new-calendar-inp');
         calendar_name_inp.setAttribute("class", "new-calendar-inp");
         calendar_name_inp.setAttribute("type", "text");
         calendarList.appendChild(calendar_name_inp);
         let idx = calendarList.children.length - 1;
         calendar_name_inp.focus();
-        
-        
-        calendar_name_inp.addEventListener('focusout', function handler()  {
-            
+    
+        calendar_name_inp.addEventListener('focusout', function handler() {
             calendarList.removeChild(calendar_name_inp);
             newCalendarBtn.toggleAttribute("creating");
         });
-
+    
         calendar_name_inp.addEventListener("keypress", (evt) => {
-            if(evt.key !== 'Enter') return;
-
+            if (evt.key !== 'Enter') return;
+    
+            // Validation: Check for empty value
+            if (!calendar_name_inp.value.trim()) {
+                alert("Calendar name cannot be empty. Please provide a valid name.");
+                return;
+            }
+    
+            // Validation: Check for special characters
+            const specialCharPattern = /[!@#$%^&*(),.?":{}|<>]/g;
+            if (specialCharPattern.test(calendar_name_inp.value)) {
+                alert("Special characters are not allowed in the calendar name.");
+                return;
+            }
+    
             $.post("/addcalendar", {
-                'calendar_name' :  calendar_name_inp.value
+                'calendar_name': calendar_name_inp.value
             }, (data, status) => {
-                //alert("Data: " + data + "\nStatus: " + status);
-                
                 updateCalendarList();
             });
-
-           
-
         });
-    }
+    };
 
     updateCalendarList();
 
@@ -346,35 +351,49 @@ let _states = {
     }
 
     let new_schedule_submit = document.getElementById('create-schedule');
-    new_schedule_submit.onclick = (evt) => {
-
-        //clear all input
+        new_schedule_submit.onclick = (evt) => {
+        // Clear all input
         let schedule_title_inp = document.getElementById('schedule-title-inp');
         let schedule_desc_inp = document.getElementById('schedule-desc-inp');
         let schedule_starttime_inp = document.getElementById('schedule-starttime-inp');
         let schedule_endtime_inp = document.getElementById('schedule-endtime-inp');
         let maxchars = document.getElementById('max-chars');
         let model_color_slider = document.getElementById('modal-color-slider');
-
-        let date = `${_states.current_date.year}-${_states.current_date.month+1}-${_states.current_date.day}`;
+    
+        // Validation: Check for empty values
+        if (!schedule_title_inp.value.trim() || !schedule_desc_inp.value.trim() || 
+            !schedule_starttime_inp.value.trim() || !schedule_endtime_inp.value.trim()) {
+            alert("All fields are required. Please fill out all fields.");
+            return;
+        }
+    
+        // Validation: Check for special characters
+        const specialCharPattern = /[!@#$%^&*(),.?":{}|<>]/g;
+        if (specialCharPattern.test(schedule_title_inp.value) || specialCharPattern.test(schedule_desc_inp.value)) {
+            alert("Special characters are not allowed in the title or description.");
+            return;
+        }
+    
+        let date = `${_states.current_date.year}-${_states.current_date.month + 1}-${_states.current_date.day}`;
         let time = new Date().toTimeString().split(' ')[0];
-
+    
+        // Send the data to the server
         $.post("/add-schedule", {
-            'schedule_title' : schedule_title_inp.value,
-            'schedule_description' : schedule_desc_inp.value,
-            'schedule_start' : schedule_starttime_inp.value,
-            'schedule_end' : schedule_endtime_inp.value,
-            'schedule_type' : 0,
-            'schedule_date' : date + " " + time,
-            'color_hue' : model_color_slider.value,
-            'calendar_id' : _states.user_calendars[_states.current_calendar.id]['id']
+            'schedule_title': schedule_title_inp.value,
+            'schedule_description': schedule_desc_inp.value,
+            'schedule_start': schedule_starttime_inp.value,
+            'schedule_end': schedule_endtime_inp.value,
+            'schedule_type': 0,
+            'schedule_date': date + " " + time,
+            'color_hue': model_color_slider.value,
+            'calendar_id': _states.user_calendars[_states.current_calendar.id]['id']
         }, (data, status) => {
             console.log("SCHEDULE UPLOAD STATUS: " + status);
             console.log("DATA: " + data);
         });
-
+    
         toggleNewScheduleModal(evt);
-    }
+    };
 
 
     let new_notes_button = document.getElementById('add-new-note');
@@ -388,29 +407,42 @@ let _states = {
     }
         
     let new_notes_submit = document.getElementById('create-note');
-    new_notes_submit.onclick = (evt) => {
-        //console.log("CLOCKED");
-        //clear all input
+        new_notes_submit.onclick = (evt) => {
+        // Clear all input
         let notes_title_inp = document.getElementById('notes-title-inp');
         let notes_desc_inp = document.getElementById('notes-desc-inp');
         let modal = document.getElementById('new-notes-modal');
-
-        let date = `${_states.current_date.year}-${_states.current_date.month+1}-${_states.current_date.day}`;
-        let time = new Date().toTimeString().split(' ')[0]; 
-
+    
+        // Validation: Check for empty values
+        if (!notes_title_inp.value.trim() || !notes_desc_inp.value.trim()) {
+            alert("All fields are required. Please fill out all fields.");
+            return;
+        }
+    
+        // Validation: Check for special characters
+        const specialCharPattern = /[!@#$%^&*(),.?":{}|<>]/g;
+        if (specialCharPattern.test(notes_title_inp.value) || specialCharPattern.test(notes_desc_inp.value)) {
+            alert("Special characters are not allowed in the title or description.");
+            return;
+        }
+    
+        let date = `${_states.current_date.year}-${_states.current_date.month + 1}-${_states.current_date.day}`;
+        let time = new Date().toTimeString().split(' ')[0];
+    
+        // Send the data to the server
         $.post("/add-note", {
-            'note_title' : notes_title_inp.value,
-            'note_description' : notes_desc_inp.value,
-            'note_date' : date + " " + time,
-            'color_hue' : model_color_slider.value,
-            'calendar_id' : _states.user_calendars[_states.current_calendar.id]['id']
+            'note_title': notes_title_inp.value,
+            'note_description': notes_desc_inp.value,
+            'note_date': date + " " + time,
+            'color_hue': model_color_slider.value,
+            'calendar_id': _states.user_calendars[_states.current_calendar.id]['id']
         }, (data, status) => {
             console.log("NOTE UPLOAD STATUS: " + status);
             console.log("DATA: " + data);
         });
-
+    
         toggleNewNotesModal(evt);
-    }
+    };
 
 
     let model_color_slider = document.getElementById('modal-color-slider');
