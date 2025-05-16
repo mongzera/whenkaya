@@ -56,3 +56,15 @@
     background-color: var(--dark-blue)  !important;
 }
 
+.errors {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: -0.5rem;
+    margin-bottom: 0.7rem;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 5px;
+}

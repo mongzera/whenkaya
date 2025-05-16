@@ -25,7 +25,7 @@ class Auth{
 
         $row = $user->getColumn('username', $username);
 
-        var_dump($row);
+        //var_dump($row);
 
         if($row == null) return false;
 
@@ -36,7 +36,7 @@ class Auth{
             return true;
         }
 
-        echo 'Incorrect Information';
+        //echo 'Incorrect Information';
         return false;
 
 
